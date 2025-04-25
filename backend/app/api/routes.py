@@ -58,6 +58,7 @@ async def signup(signupModal:SignUpModel):
         logger.error(f"Signup failed for user {signupModal.email}: {signup_result['message']}")
         raise HTTPException(status_code=400, detail="User already exists")
     
+
 @api_routes.get("/user/{user_id}")
 async def get_user(user_id: int):
     """Get user information by user ID.
@@ -87,12 +88,17 @@ async def new_profile(profileModel:profileModel):
         dict: A dictionary containing the profile creation status and user information.
     """
     # Create a new user profile in the database
+    if get_user_by_id(profileModel.user_id) is None:
+        logger.error(f"User {profileModel.user_id} not found.")
+        raise HTTPException(status_code=404, detail="User not found")
+    
     result=await create_profile(profileModel.dict())
     if result["status"] != "success":
         logger.error(f"Failed to create user {profileModel.name} profile: {result['message']}")
         raise HTTPException(status_code=400, detail="Profile creation failed")
     logger.info(f"User {profileModel.name} profile created successfully.")
     return {"status": "success",'new_profile_id':result['profile_id'], "user": profileModel}
+
 
 @api_routes.get("/profile/{user_id}")
 async def get_profile_by_userid(user_id: int):
@@ -104,7 +110,7 @@ async def get_profile_by_userid(user_id: int):
     Returns:
         profileModel: A profileModel object containing user profile information.
     """
-    # Retrieve the user profile from the database
+    
     user_profile = await get_profile_by_user_id(user_id)
     if user_profile:
         logger.info(f"User {user_id} profile retrieved successfully.")
@@ -116,7 +122,7 @@ async def get_profile_by_userid(user_id: int):
 
 
 
-@api_routes.post("/profile/{user_id}/new_resume", response_class=StreamingResponse)
+@api_routes.post("/profile/{user_id}/new_resume")
 async def new_resumes(NewResume: NewResume):
     """Create a new resume for the user and return it as a PDF.
 
@@ -126,24 +132,24 @@ async def new_resumes(NewResume: NewResume):
     Returns:
         StreamingResponse: A streaming response containing the generated PDF resume.
     """
-    # Fetch profile details
+    user= await get_user_by_id(NewResume.user_id)
+    if not user:
+        logger.error(f"User {NewResume.user_id} not found.")
+        raise HTTPException(status_code=404, detail="User not found")
+
     profile_details = await get_profile_by_id(NewResume.user_resume_id)
-    print(profile_details)
-    logger.debug(f"Profile details for user {NewResume.user_id}: {profile_details}")
     if not profile_details:
         logger.error(f"Profile not found for user_resume_id {NewResume.user_resume_id}")
         raise HTTPException(status_code=404, detail="Profile not found")
 
-    # Generate LaTeX resume
-    gen_resume = await create_resume(profile_details, NewResume.job_title, NewResume.job_description)
+    gen_resume = await create_resume(profile_details, NewResume.job_title, NewResume.job_description)  #it sends the profile details to the gemini model to generate the resume
+
     if not gen_resume:
         logger.error(f"Failed to generate resume for user {NewResume.user_id}")
         raise HTTPException(status_code=500, detail="Resume generation failed")
     
     NewResume.new_resume = str(gen_resume)
-    logger.debug(f"LaTeX code for user {NewResume.user_id}: {NewResume.new_resume}")
 
-    # Save resume metadata
     result = await new_resume(NewResume.dict())
     logger.info(f"Resume creation result: {result}")
     
@@ -151,25 +157,32 @@ async def new_resumes(NewResume: NewResume):
         logger.error(f"Failed to create resume for user {NewResume.user_id}: {result['message']}")
         raise HTTPException(status_code=400, detail="Resume creation failed")
 
-    # Convert LaTeX to PDF
-    try:
-        pdf_response = await convert_latex_to_pdf(
-            NewResume.new_resume,
-            output_filename=f"resume_{NewResume.user_id}"
-        )
-    except Exception as e:
-        logger.error(f"Failed to convert LaTeX to PDF for user {NewResume.user_id}: {str(e)}")
-        raise HTTPException(status_code=500, detail=f"PDF conversion failed: {str(e)}")
+    return {'status': 'success', 'resume_id': result['resume_id'], 'message': 'Resume created successfully'}
 
-    logger.info(f"Resume for user {NewResume.user_id} created successfully, resume_id: {result['resume_id']}")
-    
-    # Add metadata to response headers (optional)
-    pdf_response.headers["X-Resume-ID"] = str(result["resume_id"])
-    pdf_response.headers["X-Status"] = "success"
+@api_routes.get("/profile/{user_id}/new_resume/{resume_id}/pdf")
+async def get_resume_pdf(user_id: int, resume_id: int):
+    """Get the PDF of the user's resume by user ID and resume ID.
+
+    Args:
+        user_id (int): User's ID.
+        resume_id (int): Resume's ID.
+
+    Returns:
+        StreamingResponse: A streaming response containing the generated PDF resume.
+    """
+    # Retrieve the user resume from the database
+    user_resume = await get_resume_by_id(resume_id)
+    if not user_resume:
+        logger.error(f"User {user_id} resume {resume_id} not found.")
+        raise HTTPException(status_code=404, detail="User resume not found")
+
+    try:
+        pdf_response = await convert_latex_to_pdf(user_resume['new_resume'], output_filename=f"resume_{user_id}_{resume_id}")
+    except RuntimeError as e:
+        logger.error(f"PDF generation failed for user {user_id} resume {resume_id}: {str(e)}")
+        raise HTTPException(status_code=500, detail="PDF generation failed")
     
     return pdf_response
-
-
 
 @api_routes.get("/profile/{user_id}/new_resume/{resume_id}")
 async def get_resume_by_resumeid(user_id: int, resume_id: int):

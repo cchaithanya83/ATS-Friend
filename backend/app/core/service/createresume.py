@@ -6,60 +6,76 @@ from fastapi.responses import StreamingResponse
 import io
 import tempfile
 from app.core.logs import logger
+
+
 async def create_resume(resume_data: dict, job_title: str, job_description: str) -> str:
-    """Generates a resume in LaTeX format tailored to a specific job.
+    """Generates a resume in LaTeX format tailored to a specific job with a blue and black color scheme.
 
     Args:
-        resume_data (dict): A dictionary containing resume details such as 
-                           name, contact info, education, experience, skills.
+        resume_data (dict): A dictionary with resume details in the following structure:
+            {
+                'personal': {'name': str, 'email': str, 'phone': str, 'address': str},
+                'education': [{'degree': str, 'institution': str, 'years': str, 'details': str}],
+                'experience': [{'title': str, 'company': str, 'dates': str, 'responsibilities': list[str]}],
+                'skills': {'technical': list[str], 'soft': list[str]}
+            }
         job_title (str): The title of the job being applied for.
-        job_description (str): The description of the job to tailor the resume.
+        job_description (str): The job description to tailor the resume.
 
     Returns:
-        str: The generated LaTeX resume code.
+        str: The generated LaTeX resume code, compilable with pdflatex.
     """
     system_prompt = (
-        "You are a professional resume generator. Generate a resume in LaTeX format only, "
-        "returning exclusively the LaTeX code without any explanations, comments, or additional text. "
-        "Use the 'moderncv' document class with the 'classic' style and 'blue' color scheme. "
-        "Include sections for personal information, education, work experience, and skills. "
-        "Ensure the code is complete, compilable, and produces a professional-looking PDF when processed with pdflatex. "
-        "Use standard LaTeX packages and avoid any custom or non-standard commands."
-        "Rules:\n"
-        "1. Do not include any explanations or comments in the LaTeX code.\n"
-        "2. Use the 'moderncv' document class with the 'classic' style and 'blue' color scheme.\n"
-        "3. Include sections for personal information, education, work experience, and skills.\n"
-        "Each \cventry has exactly 6 arguments, even if some are empty (e.g., {})."
-        "4. Ensure the code is complete and compilable.\n"
-        "No blank lines appear within \cventry commands.\n"
-        "5. Use standard LaTeX packages and avoid any custom or non-standard commands.\n"
-        "All braces are properly matched."
-        "simple ats friendly resume with no photo and no links.\n"
-
-        
+    "You are a professional resume generator specializing in LaTeX. Generate a resume in LaTeX format using a custom blue and black color scheme. "
+    "The resume must be ATS-friendly, one page, visually appealing, and include sections for personal information, education, work experience, skills, certifications, hobbies, languages, and projects. "
+    "Rules:\n"
+    "1. Return only the LaTeX code without explanations, comments, or additional text.\n"
+    "2. Use only the following standard LaTeX packages: article, geometry, amsmath, amssymb, enumitem, ragged2e, multicol, xcolor, helvet.\n"
+    "3. Avoid non-standard packages (e.g., moderncv) and custom commands (e.g., \\cventry).\n"
+    "4. Structure experience and education entries using standard LaTeX commands (e.g., \\textbf, \\textit, minipage, or parbox) with a consistent format: job title/degree in bold, company/institution in italics, dates on the right, and bullet points for details.\n"
+    "5. Ensure all braces are properly matched and no blank lines appear within entry descriptions.\n"
+    "6. Exclude photos, hyperlinks, and any reference to the job title or description in the resume.\n"
+    "7. Define a blue color (\\definecolor{cvblue}{RGB}{0,102,204}) for headings and accents, and use black for body text.\n"
+    "8. Optimize spacing and typography for a balanced, attractive one-page layout without excessive empty space.\n"
+    "9. Use the Helvetica font by loading \\usepackage{helvet} and setting \\renewcommand{\\familydefault}{\\sfdefault} in the preamble.\n"
+    "10. Ensure the code is complete, compilable with pdflatex, and produces a professional, visually appealing PDF.\n"
+    "11. Use bullet points for responsibilities, achievements, skills, and other lists, formatted with the enumitem package.\n"
+    "12. Prioritize skills, experiences, and keywords that align with the job description, using concise, professional language.\n"
+    "13. For sections with no data (e.g., certifications, languages), omit the section entirely rather than generating an empty \\itemize environment.\n"
+    "14. Ensure no empty \\itemize environments are generated (e.g., \\begin{itemize} \\end{itemize} without \\item commands)."
     )
+
     user_prompt = (
-        "Create a resume in LaTeX format tailored for the following job:\n"
+        "Generate a LaTeX resume based on the following details:\n"
         f"Job Title: {job_title}\n"
         f"Job Description: {job_description}\n"
         "Resume Details:\n"
         f"{resume_data}\n"
-        "Structure the resume with clear sections for personal information (name, email, phone, address), "
-        "education (degrees, institutions, years), work experience (job titles, companies, dates, responsibilities), "
-        "and skills (technical and soft skills). "
-        "Optimize the resume to align with the job description by prioritizing relevant skills, experiences, and keywords. "
-        "Highlight achievements and responsibilities that match the job requirements. "
-        "Use appropriate LaTeX formatting for a clean, professional layout. "
-        "Ensure the LaTeX code is concise, optimized for quick compilation, and ATS-friendly."
-        "simple ats friendly resume with no photo and no links.\n"
-        "The resume should be in LaTeX format only, without any explanations or comments."
-        'Make the resume match with the JD and donnot include the JD or J anme in the resume.\n'
-        'resume should be only one page. with proper spacing and try not to have empty space\n'
-        "The LaTeX code should be complete and compilable, producing a professional-looking PDF when processed with pdflatex.\n"
-        "Use standard LaTeX packages and avoid any custom or non-standard commands.\n"
-    )
+        "Structure the resume with:\n"
+        "- Personal Information: Name (centered, large, bold), email, phone, address (from resume_data['personal']) in a multi line below the name.\n"
+        "- objective: A brief summary of the candidate's career goals and skills (from resume_data['objective']). And match the objective with the job title and description.\n"
+        "- Education: Degrees (bold), institutions (italics), years (right-aligned), and relevant details as bullet points (from resume_data['education']). Include only if resume_data['education'] is non-empty.\n"
+        "- Work Experience: Job titles (bold), companies (italics), dates (right-aligned), and responsibilities/achievements as bullet points (from resume_data['experience']). Include only if resume_data['experience'] is non-empty.\n"
+        "- Skills: Technical and soft skills as a bullet-point list (from resume_data['skills']). Include only if resume_data['skills'] is non-empty.\n"
+        "- Certifications: List of certifications as bullet points (from resume_data['certifications']). Include only if resume_data['certifications'] is non-empty.\n"
+        "- Projects: List of projects with title (bold), date (right-aligned), and description as bullet points (from resume_data['projects']). Include only if resume_data['projects'] is non-empty.\n"
+        "- Hobbies: List of hobbies as bullet points (from resume_data['hobbies']). Include only if resume_data['hobbies'] is non-empty.\n"
+        "- Languages: List of languages spoken as bullet points (from resume_data['languages']). Include only if resume_data['languages'] is non-empty.\n"
 
-    # Generate the resume using the text generation function
+        "Tailoring Instructions:\n"
+        "- Highlight skills and experiences relevant to the job title and description.\n"
+        "- Prioritize the most relevant education and work experience.\n"
+        "- Use a consistent format: bold section titles, bold job titles/degrees/project titles, italicized company names/institutions, right-aligned dates.\n"
+        "- Use the defined blue color (cvblue) for section titles and accents (e.g., bullet points or separators).\n"
+        "- Ensure ATS-friendly formatting: avoid tables, special characters, or complex LaTeX constructs.\n"
+        "- Optimize for one page with balanced spacing and elegant typography.\n"
+        "- Exclude the job title and description from the resume content.\n"
+        "- Ensure the code is concise, compilable with pdflatex, and produces a clean, visually appealing PDF.\n"
+        "- Stricly the resume should be single page. Alter the context if it is too long or too short. \n"
+
+        "- Omit any section if its corresponding resume_data field is empty or contains no items, and do not generate empty \\itemize environments."
+    )
+    
     generated_resume = await text_gen(system_prompt, user_prompt)
     
     return generated_resume

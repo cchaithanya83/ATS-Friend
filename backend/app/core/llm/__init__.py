@@ -7,7 +7,7 @@ load_dotenv()
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
 client = genai.Client(api_key=GEMINI_API_KEY)
 
-async def text_gen(system_prompt: str, user_prompt: str, temperature: float = 0.5, max_output_tokens: int = 1000) -> str:
+async def text_gen(system_prompt: str, user_prompt: str, temperature: float = 0.5, max_output_tokens: int = 20000) -> str:
     """Generates content based on the provided prompts and settings.
 
     Args:
@@ -33,7 +33,7 @@ async def text_gen(system_prompt: str, user_prompt: str, temperature: float = 0.
     return response.text
 
 
-async def text_gen_with_context(system_prompt: str, user_prompt: str, context: str, temperature: float = 0.5, max_output_tokens: int = 256) -> str:
+async def text_gen_with_context(system_prompt: str, user_prompt: str, context: str, temperature: float = 0.5, max_output_tokens: int = 1500) -> str:
     """Generates content based on the provided prompts, context, and settings.
 
     Args:
