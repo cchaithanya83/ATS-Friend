@@ -1,13 +1,13 @@
-
-from app.core.llm import text_gen
-from fastapi import FastAPI, HTTPException
-from fastapi.responses import StreamingResponse
+from fastapi import FastAPI, Depends, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-from app.core.database.config import check_login, new_signup , create_profile , get_profile_by_id ,get_profile_by_user_id , get_resume_by_id, get_resume_by_user_id,new_resume,get_user_by_id
-from app.core.logs import logger
+from fastapi.responses import StreamingResponse
+from pydantic import BaseModel
+from app.core.database import UserRepository, ProfileRepository, ResumeRepository
 from app.core.service import create_resume, convert_latex_to_pdf
-from app.api.models import LoginModel, NewResume, SignUpModel, User, profileModel
-api_routes= FastAPI()
+from app.api.models import LoginModel, NewResume, SignUpModel, profileModel
+from app.core.logs import logger
+
+api_routes = FastAPI()
 
 api_routes.add_middleware(
     CORSMiddleware,
@@ -17,208 +17,134 @@ api_routes.add_middleware(
     allow_headers=["*"],
 )
 
-@api_routes.post("/login")
-async def login(loginModal:LoginModel):
-    """Login endpoint to authenticate users.
+class ApiResponse(BaseModel):
+    status: str
+    message: str | None = None
+    data: dict | list | None = None
 
-    Args:
-        email (str): User's email address.
-        password (str): User's password.
+def get_user_repo():
+    return UserRepository()
 
-    Returns:
-        dict: A dictionary containing the login status and user information.
-    """
-    #check user in db 
-    login_result = await check_login(loginModal.email, loginModal.password)
-    if login_result["status"] == "success":
-        logger.info(f"User {loginModal.email} logged in successfully.")
-        return {"status": "success", "user": login_result["user"]}
-    else:
-        logger.error(f"Login failed for user {loginModal.email}: {login_result['message']}")
-        raise HTTPException(status_code=401, detail="Invalid credentials")
-    
-@api_routes.post("/signup")
-async def signup(signupModal:SignUpModel):
-    """Signup endpoint to register new users.
+def get_profile_repo():
+    return ProfileRepository()
 
-    Args:
-        name (str): User's name.
-        email (str): User's email address.
-        password (str): User's password.
-        phone (str): User's phone number.
+def get_resume_repo():
+    return ResumeRepository()
 
-    Returns:
-        dict: A dictionary containing the signup status and user information.
-    """
-    signup_result = await new_signup(signupModal.name, signupModal.email, signupModal.password, signupModal.phone)
-    if signup_result["status"] == "success":
-        logger.info(f"User {signupModal.email} signed up successfully.")
-        return {"status": "success", "user": signup_result["user"]}
-    else:
-        logger.error(f"Signup failed for user {signupModal.email}: {signup_result['message']}")
-        raise HTTPException(status_code=400, detail="User already exists")
-    
+class ResumeService:
+    def __init__(self, profile_repo: ProfileRepository, resume_repo: ResumeRepository):
+        self.profile_repo = profile_repo
+        self.resume_repo = resume_repo
 
-@api_routes.get("/user/{user_id}")
-async def get_user(user_id: int):
-    """Get user information by user ID.
+    async def create_resume(self, new_resume: NewResume):
+        profile_details = self.profile_repo.get_by_id(new_resume.user_resume_id)
+        if not profile_details:
+            raise HTTPException(status_code=404, detail="Profile not found")
 
-    Args:
-        user_id (int): User's ID.
+        gen_resume = await create_resume(profile_details[0], new_resume.job_title, new_resume.job_description)
+        if not gen_resume:
+            raise HTTPException(status_code=500, detail="Resume generation failed")
 
-    Returns:
-        User: A User object containing user information.
-    """
-    user = await get_user_by_id(user_id)
+        new_resume.new_resume = str(gen_resume)
+        result = self.resume_repo.create(new_resume.dict())
+        if result["status"] != "success":
+            raise HTTPException(status_code=400, detail="Resume creation failed")
+
+        return result
+
+def get_resume_service(profile_repo: ProfileRepository = Depends(get_profile_repo), resume_repo: ResumeRepository = Depends(get_resume_repo)):
+    return ResumeService(profile_repo, resume_repo)
+
+@api_routes.post("/login", response_model=ApiResponse)
+async def login(login_modal: LoginModel, user_repo: UserRepository = Depends(get_user_repo)):
+    logger.info(f"Login attempt for email: {login_modal.email}")
+    result = user_repo.check_login(login_modal.email, login_modal.password)
+    if result["status"] == "success":
+        logger.info(f"User {login_modal.email} logged in successfully")
+        return ApiResponse(status="success", data={"user": result["user"]})
+    logger.warning(f"Failed login for email: {login_modal.email}")
+    raise HTTPException(status_code=401, detail="Invalid credentials")
+
+@api_routes.post("/signup", response_model=ApiResponse)
+async def signup(signup_modal: SignUpModel, user_repo: UserRepository = Depends(get_user_repo)):
+    logger.info(f"Signup attempt for email: {signup_modal.email}")
+    result = user_repo.signup(signup_modal.name, signup_modal.email, signup_modal.password, signup_modal.phone)
+    if result["status"] == "success":
+        logger.info(f"User {signup_modal.email} signed up successfully")
+        return ApiResponse(status="success", data={"user": result["user"]})
+    logger.error(f"Signup failed for email: {signup_modal.email}: {result['message']}")
+    raise HTTPException(status_code=400, detail="User already exists")
+
+@api_routes.get("/user/{user_id}", response_model=ApiResponse)
+async def get_user(user_id: int, user_repo: UserRepository = Depends(get_user_repo)):
+    user = user_repo.get_by_id(user_id)
     if user:
-        logger.info(f"User {user_id} information retrieved successfully.")
-        return {"status": "success", "user":user}
-    else:
-        logger.error(f"User {user_id} not found.")
+        logger.info(f"User {user_id} information retrieved successfully")
+        return ApiResponse(status="success", data={"user": user})
+    logger.error(f"User {user_id} not found")
+    raise HTTPException(status_code=404, detail="User not found")
+
+@api_routes.post("/profile", response_model=ApiResponse)
+async def new_profile(profile: profileModel, user_repo: UserRepository = Depends(get_user_repo), profile_repo: ProfileRepository = Depends(get_profile_repo)):
+    if not user_repo.get_by_id(profile.user_id):
+        logger.error(f"User {profile.user_id} not found")
         raise HTTPException(status_code=404, detail="User not found")
     
-@api_routes.post("/profile")
-async def new_profile(profileModel:profileModel):
-    """Create a new user profile.
+    result = profile_repo.create(profile.dict())
+    if result["status"] == "success":
+        logger.info(f"Profile created for user {profile.user_id}")
+        return ApiResponse(status="success", data={"new_profile_id": result["profile_id"], "user": profile.dict()})
+    logger.error(f"Failed to create profile for user {profile.user_id}: {result['message']}")
+    raise HTTPException(status_code=400, detail="Profile creation failed")
 
-    Args:
-        profileModel (profileModel): profileModel object containing user information.
+@api_routes.get("/profile/{user_id}", response_model=ApiResponse)
+async def get_profile_by_userid(user_id: int, profile_repo: ProfileRepository = Depends(get_profile_repo)):
+    profiles = profile_repo.get_by_user_id(user_id)
+    if profiles:
+        logger.info(f"Profiles retrieved for user {user_id}")
+        return ApiResponse(status="success", data={"profiles": profiles})
+    logger.error(f"No profiles found for user {user_id}")
+    raise HTTPException(status_code=404, detail="User profiles not found")
 
-    Returns:
-        dict: A dictionary containing the profile creation status and user information.
-    """
-    # Create a new user profile in the database
-    if get_user_by_id(profileModel.user_id) is None:
-        logger.error(f"User {profileModel.user_id} not found.")
+@api_routes.post("/profile/{user_id}/new_resume", response_model=ApiResponse)
+async def new_resumes(new_resume: NewResume, user_repo: UserRepository = Depends(get_user_repo), resume_service: ResumeService = Depends(get_resume_service)):
+    if not user_repo.get_by_id(new_resume.user_id):
+        logger.error(f"User {new_resume.user_id} not found")
         raise HTTPException(status_code=404, detail="User not found")
     
-    result=await create_profile(profileModel.dict())
-    if result["status"] != "success":
-        logger.error(f"Failed to create user {profileModel.name} profile: {result['message']}")
-        raise HTTPException(status_code=400, detail="Profile creation failed")
-    logger.info(f"User {profileModel.name} profile created successfully.")
-    return {"status": "success",'new_profile_id':result['profile_id'], "user": profileModel}
-
-
-@api_routes.get("/profile/{user_id}")
-async def get_profile_by_userid(user_id: int):
-    """Get user profile information by user ID.
-
-    Args:
-        user_id (int): User's ID.
-
-    Returns:
-        profileModel: A profileModel object containing user profile information.
-    """
-    
-    user_profile = await get_profile_by_user_id(user_id)
-    if user_profile:
-        logger.info(f"User {user_id} profile retrieved successfully.")
-        return {"status": "success", "user": user_profile}
-    else:
-        logger.error(f"User {user_id} profile not found.")
-        raise HTTPException(status_code=404, detail="User profile not found")   
-    
-
-
-
-@api_routes.post("/profile/{user_id}/new_resume")
-async def new_resumes(NewResume: NewResume):
-    """Create a new resume for the user and return it as a PDF.
-
-    Args:
-        NewResume (NewResume): NewResume object containing resume information.
-
-    Returns:
-        StreamingResponse: A streaming response containing the generated PDF resume.
-    """
-    user= await get_user_by_id(NewResume.user_id)
-    if not user:
-        logger.error(f"User {NewResume.user_id} not found.")
-        raise HTTPException(status_code=404, detail="User not found")
-
-    profile_details = await get_profile_by_id(NewResume.user_resume_id)
-    if not profile_details:
-        logger.error(f"Profile not found for user_resume_id {NewResume.user_resume_id}")
-        raise HTTPException(status_code=404, detail="Profile not found")
-
-    gen_resume = await create_resume(profile_details, NewResume.job_title, NewResume.job_description)  #it sends the profile details to the gemini model to generate the resume
-
-    if not gen_resume:
-        logger.error(f"Failed to generate resume for user {NewResume.user_id}")
-        raise HTTPException(status_code=500, detail="Resume generation failed")
-    
-    NewResume.new_resume = str(gen_resume)
-
-    result = await new_resume(NewResume.dict())
-    logger.info(f"Resume creation result: {result}")
-    
-    if result["status"] != "success":
-        logger.error(f"Failed to create resume for user {NewResume.user_id}: {result['message']}")
-        raise HTTPException(status_code=400, detail="Resume creation failed")
-
-    return {'status': 'success', 'resume_id': result['resume_id'], 'message': 'Resume created successfully'}
+    result = await resume_service.create_resume(new_resume)
+    logger.info(f"Resume created for user {new_resume.user_id}")
+    return ApiResponse(status="success", data={"resume_id": result["resume_id"], "message": result["message"]})
 
 @api_routes.get("/profile/{user_id}/new_resume/{resume_id}/pdf")
-async def get_resume_pdf(user_id: int, resume_id: int):
-    """Get the PDF of the user's resume by user ID and resume ID.
-
-    Args:
-        user_id (int): User's ID.
-        resume_id (int): Resume's ID.
-
-    Returns:
-        StreamingResponse: A streaming response containing the generated PDF resume.
-    """
-    # Retrieve the user resume from the database
-    user_resume = await get_resume_by_id(resume_id)
+async def get_resume_pdf(user_id: int, resume_id: int, resume_repo: ResumeRepository = Depends(get_resume_repo)):
+    user_resume = resume_repo.get_by_id(resume_id)
     if not user_resume:
-        logger.error(f"User {user_id} resume {resume_id} not found.")
+        logger.error(f"Resume {resume_id} not found for user {user_id}")
         raise HTTPException(status_code=404, detail="User resume not found")
 
     try:
         pdf_response = await convert_latex_to_pdf(user_resume['new_resume'], output_filename=f"resume_{user_id}_{resume_id}")
+        logger.info(f"PDF generated for resume {resume_id} of user {user_id}")
+        return pdf_response
     except RuntimeError as e:
-        logger.error(f"PDF generation failed for user {user_id} resume {resume_id}: {str(e)}")
+        logger.error(f"PDF generation failed for resume {resume_id} of user {user_id}: {str(e)}")
         raise HTTPException(status_code=500, detail="PDF generation failed")
-    
-    return pdf_response
 
-@api_routes.get("/profile/{user_id}/new_resume/{resume_id}")
-async def get_resume_by_resumeid(user_id: int, resume_id: int):
-    """Get user resume information by user ID and resume ID.
-
-    Args:
-        user_id (int): User's ID.
-        resume_id (int): Resume's ID.
-
-    Returns:
-        UserResume: A UserResume object containing user resume information.
-    """
-    # Retrieve the user resume from the database
-    user_resume = await get_resume_by_id(resume_id)
+@api_routes.get("/profile/{user_id}/new_resume/{resume_id}", response_model=ApiResponse)
+async def get_resume_by_resumeid(user_id: int, resume_id: int, resume_repo: ResumeRepository = Depends(get_resume_repo)):
+    user_resume = resume_repo.get_by_id(resume_id)
     if user_resume:
-        logger.info(f"User {user_id} resume {resume_id} retrieved successfully.")
-        return {"status": "success", "user": user_resume}
-    else:
-        logger.error(f"User {user_id} resume {resume_id} not found.")
-        raise HTTPException(status_code=404, detail="User resume not found")
-    
-@api_routes.get("/profile/{user_id}/new_resume")
-async def get_all_resume_by_userid(user_id: int):
-    """Get all resumes for the user by user ID.
+        logger.info(f"Resume {resume_id} retrieved for user {user_id}")
+        return ApiResponse(status="success", data={"resume": user_resume})
+    logger.error(f"Resume {resume_id} not found for user {user_id}")
+    raise HTTPException(status_code=404, detail="User resume not found")
 
-    Args:
-        user_id (int): User's ID.
-
-    Returns:
-        List[UserResume]: A list of UserResume objects containing user resume information.
-    """
-    # Retrieve all resumes for the user from the database
-    user_resumes = await get_resume_by_user_id(user_id)
-    if user_resumes:
-        logger.info(f"User {user_id} all resumes retrieved successfully.")
-        return {"status": "success", "user": user_resumes}
-    else:
-        logger.error(f"User {user_id} resumes not found.")
-        raise HTTPException(status_code=404, detail="User resumes not found")
+@api_routes.get("/profile/{user_id}/new_resume", response_model=ApiResponse)
+async def get_all_resume_by_userid(user_id: int, resume_repo: ResumeRepository = Depends(get_resume_repo)):
+    resumes = resume_repo.get_by_user_id(user_id)
+    if resumes:
+        logger.info(f"All resumes retrieved for user {user_id}")
+        return ApiResponse(status="success", data={"resumes": resumes})
+    logger.error(f"No resumes found for user {user_id}")
+    raise HTTPException(status_code=404, detail="User resumes not found")

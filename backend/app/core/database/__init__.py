@@ -1,0 +1,1 @@
+from app.core.database.config import UserRepository, ProfileRepository, ResumeRepository
