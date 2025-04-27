@@ -1,9 +1,9 @@
+// src/components/LoginForm.tsx
 import React, { useState } from "react";
-import axios, { AxiosError } from "axios"; // Import AxiosError
+import axios, { AxiosError } from "axios";
 import { useNavigate, NavigateFunction } from "react-router-dom";
 import { LockClosedIcon, EnvelopeIcon } from "@heroicons/react/24/solid";
 
-// Type for the User object from your backend
 interface User {
   id: number;
   name: string;
@@ -12,7 +12,6 @@ interface User {
   created_at: string;
 }
 
-// Type for the successful Login API response data
 interface LoginSuccessResponse {
   status: "success";
   message: string | null;
@@ -21,10 +20,9 @@ interface LoginSuccessResponse {
   };
 }
 
-// Type for generic API error response (adjust based on your FastAPI errors)
 interface ApiErrorResponse {
-  detail?: string | { msg: string; type: string }[]; // Handling FastAPI's validation errors
-  message?: string; // Generic message fallback
+  detail?: string | { msg: string; type: string }[];
+  message?: string;
 }
 
 const API_URL = import.meta.env.VITE_API_BASE_URL || "http://127.0.0.1:8000";
@@ -70,7 +68,7 @@ const LoginForm: React.FC = () => {
             "userData",
             JSON.stringify(response.data.data.user)
           );
-          navigate("/dashboard"); // Redirect on success
+          navigate("/dashboard");
         } catch (storageError) {
           console.error(
             "Error saving user data to localStorage:",
@@ -81,26 +79,22 @@ const LoginForm: React.FC = () => {
           );
         }
       } else {
-        // Handle cases where status might not be 'success' or data format is unexpected
         setError(
           response.data.message ||
             "Login failed. Unexpected response from server."
         );
       }
     } catch (err) {
-      const error = err as AxiosError<ApiErrorResponse>; // Type assertion for AxiosError
+      const error = err as AxiosError<ApiErrorResponse>;
       console.error("Login Error:", error.response?.data || error.message);
 
       if (error.response) {
-        // Server responded with a status code outside the 2xx range
         const status = error.response.status;
         const responseData = error.response.data;
 
         if (status === 401 || status === 403) {
-          // Handle typical unauthorized/forbidden codes
           setError("Invalid email or password.");
         } else if (responseData?.detail) {
-          // FastAPI validation errors
           if (typeof responseData.detail === "string") {
             setError(responseData.detail);
           } else if (
@@ -115,18 +109,15 @@ const LoginForm: React.FC = () => {
             setError("Login failed due to invalid data.");
           }
         } else if (responseData?.message) {
-          // Check for a generic message field
           setError(responseData.message);
         } else {
           setError(`An error occurred (Status: ${status}). Please try again.`);
         }
       } else if (error.request) {
-        // The request was made but no response was received
         setError(
           "Could not connect to the server. Please check your network and try again."
         );
       } else {
-        // Something happened in setting up the request that triggered an Error
         setError(
           "An unexpected error occurred during login setup. Please try again."
         );
@@ -147,9 +138,10 @@ const LoginForm: React.FC = () => {
         </div>
       )}
       <input type="hidden" name="remember" defaultValue="true" />
-      <div className="rounded-md shadow-sm -space-y-px">
-        {/* Email Input */}
-        <div>
+      <div className="shadow-sm space-y-4">
+        {" "}
+        {/* Added space-y-4 for better spacing */}
+        <div className="rounded-md">
           <label htmlFor="email-address-login" className="sr-only">
             Email address
           </label>
@@ -166,7 +158,7 @@ const LoginForm: React.FC = () => {
               type="email"
               autoComplete="email"
               required
-              className="appearance-none rounded-none relative block w-full px-3 py-2 pl-10 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-primary focus:border-primary focus:z-10 sm:text-sm dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-light dark:focus:border-primary-light"
+              className="appearance-none relative block w-full px-3 py-2 pl-10 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-primary focus:border-primary focus:z-10 sm:text-sm dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-light dark:focus:border-primary-light"
               placeholder="Email address"
               value={email}
               onChange={handleInputChange(setEmail)}
@@ -174,8 +166,9 @@ const LoginForm: React.FC = () => {
             />
           </div>
         </div>
-        {/* Password Input */}
-        <div>
+        <div className="rounded-md">
+          {" "}
+          {/* Added rounded-md */}
           <label htmlFor="password-login" className="sr-only">
             Password
           </label>
@@ -192,7 +185,7 @@ const LoginForm: React.FC = () => {
               type="password"
               autoComplete="current-password"
               required
-              className="appearance-none rounded-none relative block w-full px-3 py-2 pl-10 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-primary focus:border-primary focus:z-10 sm:text-sm dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-light dark:focus:border-primary-light"
+              className="appearance-none relative block w-full px-3 py-2 pl-10 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-primary focus:border-primary focus:z-10 sm:text-sm dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-light dark:focus:border-primary-light"
               placeholder="Password"
               value={password}
               onChange={handleInputChange(setPassword)}

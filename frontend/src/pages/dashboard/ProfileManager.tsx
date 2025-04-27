@@ -1,29 +1,27 @@
 // src/pages/dashboard/ProfileManager.tsx
 import React, { useState, useEffect, useCallback } from "react";
-import { fetchProfiles, createProfile, getUserId } from "../../services/api"; // Adjust path
-import { ProfileModel } from "../../types/api"; // Adjust path
-import LoadingSpinner from "../../components/common/LoadingSpinner"; // Adjust path
+import { fetchProfiles, createProfile, getUserId } from "../../services/api";
+import { ProfileModel } from "../../types/api";
+import LoadingSpinner from "../../components/common/LoadingSpinner";
 import {
   PlusCircleIcon,
   UserCircleIcon,
   IdentificationIcon,
 } from "@heroicons/react/24/outline";
 
-// *** STEP 1: Update ProfileFormData interface ***
 interface ProfileFormData {
   profile_name: string;
   name: string;
   email: string;
-  phone?: string;
-  address?: string;
-  education?: string; // Changed to optional string
-  experience?: string; // Changed to optional string
-  skills?: string; // Changed to optional string
-  certifications?: string; // Changed to optional string
-  projects?: string; // Changed to optional string
-  languages?: string; // Changed to optional string
-  hobbies?: string; // Changed to optional string
-  created_at?: string; // Optional: ISO string for creation date
+  phone?: string | null; // Allow null
+  address?: string | null;
+  education?: string | null;
+  experience?: string | null;
+  skills?: string | null;
+  certifications?: string | null;
+  projects?: string | null;
+  languages?: string | null;
+  hobbies?: string | null;
 }
 
 const ProfileManager: React.FC = () => {
@@ -34,7 +32,6 @@ const ProfileManager: React.FC = () => {
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [formError, setFormError] = useState<string>("");
 
-  // *** STEP 2: Update formData state initialization ***
   const initialFormData: ProfileFormData = {
     profile_name: "",
     name: "",
@@ -48,7 +45,6 @@ const ProfileManager: React.FC = () => {
     projects: "",
     languages: "",
     hobbies: "",
-    created_at: new Date().toISOString(), // Optional: Set default created_at to now
   };
   const [formData, setFormData] = useState<ProfileFormData>(initialFormData);
 
@@ -77,9 +73,8 @@ const ProfileManager: React.FC = () => {
     loadProfiles();
   }, [loadProfiles]);
 
-  // *** STEP 4: handleInputChange already handles textarea ***
   const handleInputChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement> // Handles both
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
@@ -105,30 +100,44 @@ const ProfileManager: React.FC = () => {
     setIsSubmitting(true);
     setFormError("");
 
-    // *** STEP 5: Update profilePayload construction ***
-    const profilePayload: Omit<ProfileModel, "id" | "created_at"> = {
+    // Prepare payload, ensuring empty strings become null for optional fields
+    const profilePayload = Object.entries(formData).reduce(
+      (acc, [key, value]) => {
+        const trimmedValue = typeof value === "string" ? value.trim() : value;
+        // Handle optional fields specifically, required fields are already validated
+        if (
+          [
+            "phone",
+            "address",
+            "education",
+            "experience",
+            "skills",
+            "certifications",
+            "projects",
+            "languages",
+            "hobbies",
+          ].includes(key)
+        ) {
+          acc[key as keyof ProfileFormData] =
+            trimmedValue === "" ? null : trimmedValue;
+        } else {
+          acc[key as keyof ProfileFormData] = trimmedValue; // Keep required fields as they are (trimmed)
+        }
+        return acc;
+      },
+      {} as ProfileFormData
+    );
+
+    const finalPayload: Omit<ProfileModel, "id" | "created_at"> = {
+      ...profilePayload,
       user_id: userId,
-      profile_name: formData.profile_name.trim(),
-      name: formData.name.trim(),
-      email: formData.email.trim(),
-      phone: formData.phone?.trim() || null,
-      address: formData.address?.trim() || null,
-      // Get values from formData, trim, and set to null if empty
-      education: formData.education?.trim() || null,
-      experience: formData.experience?.trim() || null,
-      skills: formData.skills?.trim() || null,
-      certifications: formData.certifications?.trim() || null,
-      projects: formData.projects?.trim() || null,
-      languages: formData.languages?.trim() || null,
-      hobbies: formData.hobbies?.trim() || null,
     };
 
     try {
-      const newProfile = await createProfile(profilePayload);
+      const newProfile = await createProfile(finalPayload);
       setProfiles((prev) => [newProfile, ...prev]);
       setShowAddForm(false);
-      // *** STEP 6: Update Form Reset ***
-      setFormData(initialFormData); // Reset form to initial empty state
+      setFormData(initialFormData);
     } catch (err) {
       setFormError(
         err instanceof Error ? err.message : "Failed to create profile."
@@ -139,19 +148,21 @@ const ProfileManager: React.FC = () => {
     }
   };
 
-  // Helper function for common input/textarea classes
   const getInputClasses = (isTextarea: boolean = false): string => {
-    return `block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-primary-dark focus:border-primary-dark sm:text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 ${
+    return `block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-primary-dark focus:border-primary-dark sm:text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 disabled:opacity-50 ${
       isTextarea ? "min-h-[80px]" : ""
-    }`; // Add min-height for textareas
+    }`;
   };
 
-  // --- Render Logic ---
+  const labelBaseClass =
+    "block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1";
+
   return (
-    <div className="p-4 md:p-6">
-      {/* Header and Add Button */}
+    <div>
+      {" "}
+      {/* Removed outer padding, handled by DashboardLayout */}
       <div className="flex flex-wrap justify-between items-center mb-6 gap-4">
-        <h1 className="text-2xl font-semibold text-gray-900 dark:text-white">
+        <h1 className="text-2xl sm:text-3xl font-semibold text-gray-900 dark:text-white">
           Your Profiles
         </h1>
         <button
@@ -164,7 +175,7 @@ const ProfileManager: React.FC = () => {
               ? "Cancel Adding Profile"
               : "Add New Profile"
           }
-          className={`inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-dark ${
+          className={`inline-flex items-center px-3 py-1.5 sm:px-4 sm:py-2 border border-transparent text-xs sm:text-sm font-medium rounded-md shadow-sm text-white transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-dark dark:focus:ring-offset-gray-900 ${
             !userId
               ? "bg-gray-400 cursor-not-allowed"
               : showAddForm
@@ -174,22 +185,20 @@ const ProfileManager: React.FC = () => {
         >
           {showAddForm ? (
             <>
-              <PlusCircleIcon className="w-5 h-5 mr-2 transform rotate-45" />
+              <PlusCircleIcon className="w-4 h-4 sm:w-5 sm:h-5 mr-1 sm:mr-2 transform rotate-45" />
               Cancel
             </>
           ) : (
             <>
-              <PlusCircleIcon className="w-5 h-5 mr-2" />
-              Add New Profile
+              <PlusCircleIcon className="w-4 h-4 sm:w-5 sm:h-5 mr-1 sm:mr-2" />
+              Add New
             </>
           )}
         </button>
       </div>
-
-      {/* Add Profile Form - Render conditionally */}
       {showAddForm && (
-        <div className="mb-8 p-6 bg-white dark:bg-gray-800 rounded-lg shadow-md border dark:border-gray-700">
-          <h2 className="text-xl font-semibold mb-4 text-gray-800 dark:text-white border-b dark:border-gray-600 pb-2">
+        <div className="mb-8 p-4 sm:p-6 bg-white dark:bg-gray-800 rounded-lg shadow-md border dark:border-gray-700">
+          <h2 className="text-lg sm:text-xl font-semibold mb-4 text-gray-800 dark:text-white border-b dark:border-gray-600 pb-2">
             Create New Profile
           </h2>
           {formError && (
@@ -198,19 +207,13 @@ const ProfileManager: React.FC = () => {
             </div>
           )}
           <form onSubmit={handleAddProfileSubmit} className="space-y-6">
-            {" "}
-            {/* Increased space */}
-            {/* --- Basic Info Section --- */}
-            <fieldset className="border dark:border-gray-600 p-4 rounded-md">
-              <legend className="text-base font-medium text-gray-900 dark:text-white px-2">
+            <fieldset className="border dark:border-gray-600 p-3 sm:p-4 rounded-md">
+              <legend className="text-sm sm:text-base font-medium text-gray-900 dark:text-white px-2">
                 Basic Information
               </legend>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-2">
                 <div>
-                  <label
-                    htmlFor="profile_name"
-                    className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
-                  >
+                  <label htmlFor="profile_name" className={labelBaseClass}>
                     Profile Nickname *
                   </label>
                   <input
@@ -222,13 +225,11 @@ const ProfileManager: React.FC = () => {
                     onChange={handleInputChange}
                     className={getInputClasses()}
                     placeholder="e.g., Main Profile, SDE Role"
+                    disabled={isSubmitting}
                   />
                 </div>
                 <div>
-                  <label
-                    htmlFor="name"
-                    className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
-                  >
+                  <label htmlFor="name" className={labelBaseClass}>
                     Your Full Name *
                   </label>
                   <input
@@ -240,13 +241,11 @@ const ProfileManager: React.FC = () => {
                     onChange={handleInputChange}
                     className={getInputClasses()}
                     placeholder="John Doe"
+                    disabled={isSubmitting}
                   />
                 </div>
                 <div>
-                  <label
-                    htmlFor="email"
-                    className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
-                  >
+                  <label htmlFor="email" className={labelBaseClass}>
                     Email *
                   </label>
                   <input
@@ -258,212 +257,188 @@ const ProfileManager: React.FC = () => {
                     onChange={handleInputChange}
                     className={getInputClasses()}
                     placeholder="you@example.com"
+                    disabled={isSubmitting}
                   />
                 </div>
                 <div>
-                  <label
-                    htmlFor="phone"
-                    className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
-                  >
-                    Phone
+                  <label htmlFor="phone" className={labelBaseClass}>
+                    Phone (Optional)
                   </label>
                   <input
                     type="tel"
                     id="phone"
                     name="phone"
-                    value={formData.phone}
+                    value={formData.phone ?? ""} // Handle null for controlled input
                     onChange={handleInputChange}
                     className={getInputClasses()}
                     placeholder="Optional"
+                    disabled={isSubmitting}
                   />
                 </div>
                 <div className="md:col-span-2">
-                  <label
-                    htmlFor="address"
-                    className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
-                  >
-                    Address
+                  <label htmlFor="address" className={labelBaseClass}>
+                    Address (Optional)
                   </label>
                   <input
                     type="text"
                     id="address"
                     name="address"
-                    value={formData.address}
+                    value={formData.address ?? ""}
                     onChange={handleInputChange}
                     className={getInputClasses()}
                     placeholder="Optional: City, State, Country"
+                    disabled={isSubmitting}
                   />
                 </div>
               </div>
             </fieldset>
-            {/* --- Professional Details Section --- */}
-            <fieldset className="border dark:border-gray-600 p-4 rounded-md">
-              <legend className="text-base font-medium text-gray-900 dark:text-white px-2">
-                Professional Details
+
+            <fieldset className="border dark:border-gray-600 p-3 sm:p-4 rounded-md">
+              <legend className="text-sm sm:text-base font-medium text-gray-900 dark:text-white px-2">
+                Professional Details (Optional)
               </legend>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-2">
-                {" "}
-                {/* Increased gap */}
-                {/* *** STEP 3: Add Form Inputs *** */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 mt-2">
                 <div className="md:col-span-2">
-                  <label
-                    htmlFor="education"
-                    className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
-                  >
+                  <label htmlFor="education" className={labelBaseClass}>
                     Education
                   </label>
                   <textarea
                     id="education"
                     name="education"
-                    value={formData.education}
+                    value={formData.education ?? ""}
                     onChange={handleInputChange}
-                    className={getInputClasses(true)} // Indicate textarea
-                    placeholder="Optional: List degrees, schools, dates (e.g., B.S. Computer Science, XYZ University, 2020)"
-                    rows={3} // Suggest initial rows
+                    className={getInputClasses(true)}
+                    placeholder="List degrees, schools, dates..."
+                    rows={3}
+                    disabled={isSubmitting}
                   />
                 </div>
                 <div className="md:col-span-2">
-                  <label
-                    htmlFor="experience"
-                    className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
-                  >
+                  <label htmlFor="experience" className={labelBaseClass}>
                     Work Experience
                   </label>
                   <textarea
                     id="experience"
                     name="experience"
-                    value={formData.experience}
+                    value={formData.experience ?? ""}
                     onChange={handleInputChange}
                     className={getInputClasses(true)}
-                    placeholder="Optional: List job titles, companies, dates, responsibilities/achievements"
+                    placeholder="List job titles, companies, dates, achievements..."
                     rows={5}
+                    disabled={isSubmitting}
                   />
                 </div>
                 <div className="md:col-span-2">
-                  <label
-                    htmlFor="skills"
-                    className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
-                  >
+                  <label htmlFor="skills" className={labelBaseClass}>
                     Skills
                   </label>
                   <textarea
                     id="skills"
                     name="skills"
-                    value={formData.skills}
+                    value={formData.skills ?? ""}
                     onChange={handleInputChange}
                     className={getInputClasses(true)}
-                    placeholder="Optional: Comma-separated list (e.g., Python, React, AWS, Project Management)"
+                    placeholder="Comma-separated: Python, React, AWS..."
                     rows={3}
+                    disabled={isSubmitting}
                   />
                 </div>
                 <div>
-                  <label
-                    htmlFor="certifications"
-                    className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
-                  >
+                  <label htmlFor="certifications" className={labelBaseClass}>
                     Certifications
                   </label>
-                  <textarea // Changed to textarea for potentially longer lists
+                  <textarea
                     id="certifications"
                     name="certifications"
-                    value={formData.certifications}
+                    value={formData.certifications ?? ""}
                     onChange={handleInputChange}
                     className={getInputClasses(true)}
-                    placeholder="Optional: List certifications (e.g., AWS Certified Developer, PMP)"
+                    placeholder="List certifications..."
                     rows={2}
+                    disabled={isSubmitting}
                   />
                 </div>
                 <div>
-                  <label
-                    htmlFor="languages"
-                    className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
-                  >
+                  <label htmlFor="languages" className={labelBaseClass}>
                     Languages Spoken
                   </label>
                   <input
                     type="text"
                     id="languages"
                     name="languages"
-                    value={formData.languages}
+                    value={formData.languages ?? ""}
                     onChange={handleInputChange}
                     className={getInputClasses()}
-                    placeholder="Optional: e.g., English (Native), Spanish (Fluent)"
+                    placeholder="e.g., English (Native), Spanish (Fluent)"
+                    disabled={isSubmitting}
                   />
                 </div>
                 <div className="md:col-span-2">
-                  <label
-                    htmlFor="projects"
-                    className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
-                  >
+                  <label htmlFor="projects" className={labelBaseClass}>
                     Projects
                   </label>
                   <textarea
                     id="projects"
                     name="projects"
-                    value={formData.projects}
+                    value={formData.projects ?? ""}
                     onChange={handleInputChange}
                     className={getInputClasses(true)}
-                    placeholder="Optional: Describe personal or professional projects, links if available"
+                    placeholder="Describe projects, links if available..."
                     rows={4}
+                    disabled={isSubmitting}
                   />
                 </div>
                 <div className="md:col-span-2">
-                  <label
-                    htmlFor="hobbies"
-                    className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
-                  >
+                  <label htmlFor="hobbies" className={labelBaseClass}>
                     Hobbies & Interests
                   </label>
                   <input
                     type="text"
                     id="hobbies"
                     name="hobbies"
-                    value={formData.hobbies}
+                    value={formData.hobbies ?? ""}
                     onChange={handleInputChange}
                     className={getInputClasses()}
-                    placeholder="Optional: e.g., Hiking, Photography, Open Source Contribution"
+                    placeholder="e.g., Hiking, Photography..."
+                    disabled={isSubmitting}
                   />
                 </div>
               </div>
             </fieldset>
-            {/* Form Actions */}
-            <div className="flex justify-end pt-6 border-t dark:border-gray-600 space-x-3">
+
+            <div className="flex justify-end pt-4 sm:pt-6 border-t dark:border-gray-600 space-x-3">
               <button
                 type="button"
                 onClick={() => {
                   setShowAddForm(false);
-                  setFormData(initialFormData); // Also reset form on explicit cancel
-                  setFormError(""); // Clear form error on cancel
+                  setFormData(initialFormData);
+                  setFormError("");
                 }}
-                className="px-4 py-2 border border-gray-300 dark:border-gray-500 rounded-md shadow-sm text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
+                className="px-3 py-1.5 sm:px-4 sm:py-2 border border-gray-300 dark:border-gray-500 rounded-md shadow-sm text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
               >
                 Cancel
               </button>
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className={`inline-flex justify-center items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-primary hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-dark ${
+                className={`inline-flex justify-center items-center px-3 py-1.5 sm:px-4 sm:py-2 border border-transparent text-xs sm:text-sm font-medium rounded-md shadow-sm text-white bg-primary hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-dark dark:focus:ring-offset-gray-900 ${
                   isSubmitting ? "opacity-50 cursor-not-allowed" : ""
                 }`}
               >
                 {isSubmitting ? (
                   <LoadingSpinner size="small" color="white" className="mr-2" />
                 ) : null}
-                {isSubmitting ? "Saving Profile..." : "Save Profile"}
+                {isSubmitting ? "Saving..." : "Save Profile"}
               </button>
             </div>
           </form>
         </div>
       )}
-
-      {/* Loading State */}
       {loading && (
         <div className="flex justify-center items-center h-40">
           <LoadingSpinner />
         </div>
       )}
-
-      {/* Error Display */}
       {!loading && error && (
         <div className="my-4 text-red-700 dark:text-red-300 p-4 bg-red-100 dark:bg-red-900/50 rounded border border-red-300 dark:border-red-600">
           <p className="font-medium">Error loading profiles:</p>
@@ -476,45 +451,38 @@ const ProfileManager: React.FC = () => {
           </button>
         </div>
       )}
-
-      {/* Content Display (Existing Profiles List - no changes needed here) */}
       {!loading && !error && (
         <>
-          {/* Empty State Message */}
           {profiles.length === 0 && !showAddForm && (
             <div className="text-center py-10 px-6 bg-gray-50 dark:bg-gray-800 rounded-lg border border-dashed border-gray-300 dark:border-gray-600">
-              <IdentificationIcon className="mx-auto h-12 w-12 text-gray-400" />
+              <IdentificationIcon className="mx-auto h-10 w-10 sm:h-12 sm:w-12 text-gray-400" />
               <h3 className="mt-2 text-sm font-medium text-gray-900 dark:text-white">
                 No profiles created yet
               </h3>
               <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
-                Get started by creating your first profile using the button
-                above.
+                Get started by creating your first profile.
               </p>
-              {/* Optional: Add the button here too if you prefer */}
             </div>
           )}
 
-          {/* List Existing Profiles */}
           {profiles.length > 0 && (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
               {profiles.map((profile) => (
                 <div
                   key={profile.id}
                   className="bg-white dark:bg-gray-800 rounded-lg shadow overflow-hidden border border-gray-200 dark:border-gray-700 flex flex-col"
                 >
-                  <div className="p-5 flex-grow">
+                  <div className="p-4 sm:p-5 flex-grow">
                     <div className="flex items-center mb-3">
-                      <UserCircleIcon className="w-6 h-6 mr-2 text-primary dark:text-primary-light flex-shrink-0" />
+                      <UserCircleIcon className="w-5 h-5 sm:w-6 sm:h-6 mr-2 text-primary dark:text-primary-light flex-shrink-0" />
                       <h3
-                        className="text-lg font-semibold text-gray-900 dark:text-white truncate"
+                        className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white truncate"
                         title={profile.profile_name}
                       >
                         {profile.profile_name}
                       </h3>
                     </div>
-                    <div className="space-y-2 text-sm text-gray-700 dark:text-gray-300">
-                      {/* Basic Info */}
+                    <div className="space-y-1.5 text-xs sm:text-sm text-gray-700 dark:text-gray-300">
                       <p>
                         <strong className="font-medium text-gray-800 dark:text-gray-200">
                           Name:
@@ -543,14 +511,12 @@ const ProfileManager: React.FC = () => {
                           {profile.address}
                         </p>
                       )}
-
-                      {/* Detailed Info - Conditionally render if data exists */}
                       {profile.education && (
                         <p>
                           <strong className="font-medium text-gray-800 dark:text-gray-200">
                             Education:
                           </strong>{" "}
-                          <span className="whitespace-pre-wrap">
+                          <span className="whitespace-pre-wrap block pl-2">
                             {profile.education}
                           </span>
                         </p>
@@ -560,7 +526,7 @@ const ProfileManager: React.FC = () => {
                           <strong className="font-medium text-gray-800 dark:text-gray-200">
                             Experience:
                           </strong>{" "}
-                          <span className="whitespace-pre-wrap">
+                          <span className="whitespace-pre-wrap block pl-2">
                             {profile.experience}
                           </span>
                         </p>
@@ -570,7 +536,7 @@ const ProfileManager: React.FC = () => {
                           <strong className="font-medium text-gray-800 dark:text-gray-200">
                             Skills:
                           </strong>{" "}
-                          <span className="whitespace-pre-wrap">
+                          <span className="whitespace-pre-wrap block pl-2">
                             {profile.skills}
                           </span>
                         </p>
@@ -580,7 +546,7 @@ const ProfileManager: React.FC = () => {
                           <strong className="font-medium text-gray-800 dark:text-gray-200">
                             Certifications:
                           </strong>{" "}
-                          <span className="whitespace-pre-wrap">
+                          <span className="whitespace-pre-wrap block pl-2">
                             {profile.certifications}
                           </span>
                         </p>
@@ -590,7 +556,7 @@ const ProfileManager: React.FC = () => {
                           <strong className="font-medium text-gray-800 dark:text-gray-200">
                             Projects:
                           </strong>{" "}
-                          <span className="whitespace-pre-wrap">
+                          <span className="whitespace-pre-wrap block pl-2">
                             {profile.projects}
                           </span>
                         </p>
@@ -600,7 +566,7 @@ const ProfileManager: React.FC = () => {
                           <strong className="font-medium text-gray-800 dark:text-gray-200">
                             Languages:
                           </strong>{" "}
-                          <span className="whitespace-pre-wrap">
+                          <span className="whitespace-pre-wrap block pl-2">
                             {profile.languages}
                           </span>
                         </p>
@@ -610,18 +576,17 @@ const ProfileManager: React.FC = () => {
                           <strong className="font-medium text-gray-800 dark:text-gray-200">
                             Hobbies:
                           </strong>{" "}
-                          <span className="whitespace-pre-wrap">
+                          <span className="whitespace-pre-wrap block pl-2">
                             {profile.hobbies}
                           </span>
                         </p>
                       )}
                     </div>
                   </div>
-                  <div className="border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50 px-5 py-3">
+                  <div className="border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50 px-4 sm:px-5 py-2 sm:py-3">
                     <p className="text-xs text-gray-500 dark:text-gray-400">
                       ID: {profile.id} | Created:{" "}
-                      {new Date(profile.created_at).toLocaleString()}{" "}
-                      {/* Use toLocaleString for date+time */}
+                      {new Date(profile.created_at).toLocaleString()}
                     </p>
                   </div>
                 </div>

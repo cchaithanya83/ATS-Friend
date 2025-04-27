@@ -1,19 +1,20 @@
+// src/pages/dashboard/GenerateResume.tsx
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   fetchProfiles,
   generateNewResume,
   getUserId,
-} from "../../services/api"; // Adjust path
-import { ProfileModel, NewResumePayload } from "../../types/api"; // Adjust path
-import LoadingSpinner from "../../components/common/LoadingSpinner"; // Adjust path
+} from "../../services/api";
+import { ProfileModel, NewResumePayload } from "../../types/api";
+import LoadingSpinner from "../../components/common/LoadingSpinner";
 
 const GenerateResume: React.FC = () => {
   const [profiles, setProfiles] = useState<ProfileModel[]>([]);
-  const [selectedProfileId, setSelectedProfileId] = useState<string>(""); // Use string for select value
+  const [selectedProfileId, setSelectedProfileId] = useState<string>("");
   const [jobTitle, setJobTitle] = useState<string>("");
   const [jobDescription, setJobDescription] = useState<string>("");
-  const [resumeName, setResumeName] = useState<string>(""); // Name for the generated resume
+  const [resumeName, setResumeName] = useState<string>("");
   const [loadingProfiles, setLoadingProfiles] = useState<boolean>(true);
   const [isGenerating, setIsGenerating] = useState<boolean>(false);
   const [error, setError] = useState<string>("");
@@ -33,7 +34,7 @@ const GenerateResume: React.FC = () => {
         const data = await fetchProfiles(userId);
         setProfiles(data);
         if (data.length > 0 && data[0].id) {
-          setSelectedProfileId(String(data[0].id)); // Default to first profile's ID
+          setSelectedProfileId(String(data[0].id));
         }
       } catch (err) {
         setError(
@@ -70,27 +71,22 @@ const GenerateResume: React.FC = () => {
       return;
     }
 
-    // Construct payload based on NewResumePayload type and API spec
-    // Assuming 'user_resume_id' in the OpenAPI spec refers to the base 'profile_id'
     const payload: NewResumePayload = {
       user_id: userId,
-      user_resume_id: profileIdNum, // Using the selected profile ID here
+      user_resume_id: profileIdNum,
       name: resumeName.trim(),
       job_title: jobTitle.trim(),
       job_description: jobDescription.trim(),
-      created_at: new Date().toISOString(), // Assuming the backend requires this field
-      // created_at is added by the service function
+      created_at: new Date().toISOString(), // Let service/API handle this ideally
     };
 
     setIsGenerating(true);
     try {
       const generatedResume = await generateNewResume(userId, payload);
-      // Navigate to the view page of the newly generated resume
       const newResumeId = generatedResume.resume_id;
       if (newResumeId) {
         navigate(`/dashboard/resumes/${newResumeId}`);
       } else {
-        // Fallback: Navigate to the list if ID isn't returned as expected
         console.warn(
           "Generated resume ID not found in response, navigating to list."
         );
@@ -106,13 +102,19 @@ const GenerateResume: React.FC = () => {
     }
   };
 
+  const inputBaseClass =
+    "mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary sm:text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:placeholder-gray-400 disabled:opacity-50 disabled:cursor-not-allowed";
+  const labelBaseClass =
+    "block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1";
+
   return (
-    <div>
-      <h1 className="text-2xl font-semibold text-gray-900 dark:text-white mb-6">
+    <div className="max-w-4xl mx-auto">
+      {" "}
+      {/* Limit width for better readability */}
+      <h1 className="text-2xl sm:text-3xl font-semibold text-gray-900 dark:text-white mb-6">
         Generate New Resume
       </h1>
-
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-4 sm:p-6">
         {error && (
           <div className="mb-4 text-red-600 dark:text-red-400 text-sm p-3 bg-red-100 dark:bg-red-900 border border-red-300 dark:border-red-700 rounded">
             {error}
@@ -120,18 +122,16 @@ const GenerateResume: React.FC = () => {
         )}
 
         <form onSubmit={handleSubmit} className="space-y-5">
-          {/* Profile Selection */}
           <div>
-            <label
-              htmlFor="profile"
-              className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
-            >
+            <label htmlFor="profile" className={labelBaseClass}>
               Base Profile *
             </label>
             {loadingProfiles ? (
-              <LoadingSpinner size="small" />
+              <div className="mt-1">
+                <LoadingSpinner size="small" />
+              </div>
             ) : profiles.length === 0 ? (
-              <p className="text-sm text-gray-500 dark:text-gray-400">
+              <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
                 No profiles found. Please{" "}
                 <a
                   href="/dashboard/profiles"
@@ -148,7 +148,7 @@ const GenerateResume: React.FC = () => {
                 value={selectedProfileId}
                 onChange={(e) => setSelectedProfileId(e.target.value)}
                 required
-                className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-primary focus:border-primary sm:text-sm rounded-md dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                className={`${inputBaseClass} pr-10 py-2 text-base`} // Adjusted padding for select
                 disabled={isGenerating}
               >
                 <option value="" disabled>
@@ -163,12 +163,8 @@ const GenerateResume: React.FC = () => {
             )}
           </div>
 
-          {/* Resume Name */}
           <div>
-            <label
-              htmlFor="resumeName"
-              className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
-            >
+            <label htmlFor="resumeName" className={labelBaseClass}>
               Resume Name *
             </label>
             <input
@@ -178,18 +174,14 @@ const GenerateResume: React.FC = () => {
               value={resumeName}
               onChange={(e) => setResumeName(e.target.value)}
               required
-              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary sm:text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+              className={inputBaseClass}
               placeholder="e.g., Application for Google SWE"
               disabled={isGenerating}
             />
           </div>
 
-          {/* Job Title */}
           <div>
-            <label
-              htmlFor="jobTitle"
-              className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
-            >
+            <label htmlFor="jobTitle" className={labelBaseClass}>
               Job Title *
             </label>
             <input
@@ -199,48 +191,47 @@ const GenerateResume: React.FC = () => {
               value={jobTitle}
               onChange={(e) => setJobTitle(e.target.value)}
               required
-              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary sm:text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+              className={inputBaseClass}
               placeholder="e.g., Senior Software Engineer"
               disabled={isGenerating}
             />
           </div>
 
-          {/* Job Description */}
           <div>
-            <label
-              htmlFor="jobDescription"
-              className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
-            >
+            <label htmlFor="jobDescription" className={labelBaseClass}>
               Job Description (Paste Here) *
             </label>
             <textarea
               id="jobDescription"
               name="jobDescription"
-              rows={10}
+              rows={10} // Adjust rows as needed
               value={jobDescription}
               onChange={(e) => setJobDescription(e.target.value)}
               required
-              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary sm:text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+              className={inputBaseClass}
               placeholder="Paste the full job description text here..."
               disabled={isGenerating}
             />
           </div>
 
-          {/* Submit Button */}
           <div className="flex justify-end pt-2">
             <button
               type="submit"
               disabled={
                 isGenerating || loadingProfiles || profiles.length === 0
               }
-              className={`inline-flex items-center justify-center px-6 py-2 border border-transparent text-base font-medium rounded-md shadow-sm text-white ${
+              className={`inline-flex items-center justify-center px-5 py-2 sm:px-6 sm:py-2.5 border border-transparent text-sm sm:text-base font-medium rounded-md shadow-sm text-white ${
                 isGenerating || loadingProfiles || profiles.length === 0
-                  ? "bg-indigo-300 cursor-not-allowed"
-                  : "bg-indigo-600 hover:bg-indigo-700"
-              } focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:focus:ring-offset-gray-800 transition duration-150`}
+                  ? "bg-indigo-300 dark:bg-indigo-800 cursor-not-allowed"
+                  : "bg-primary hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary dark:bg-primary-dark dark:hover:bg-primary dark:focus:ring-offset-gray-800"
+              } transition duration-150 ease-in-out`}
             >
               {isGenerating ? (
-                <LoadingSpinner size="small" color="white" className="mr-3" />
+                <LoadingSpinner
+                  size="small"
+                  color="white"
+                  className="mr-2 sm:mr-3"
+                />
               ) : null}
               {isGenerating ? "Generating..." : "Generate Resume"}
             </button>

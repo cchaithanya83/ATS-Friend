@@ -1,3 +1,4 @@
+// src/components/SignupForm.tsx
 import React, { useState } from "react";
 import axios, { AxiosError } from "axios";
 import {
@@ -7,7 +8,6 @@ import {
   PhoneIcon,
 } from "@heroicons/react/24/solid";
 
-// Type for the successful Signup API response data
 interface SignupSuccessResponse {
   status: "success";
   message: string | null;
@@ -19,13 +19,11 @@ interface SignupSuccessResponse {
   };
 }
 
-// Re-use ApiErrorResponse from LoginForm or redefine if signup errors differ significantly
 interface ApiErrorResponse {
-  detail?: string | { msg: string; type: string }[]; // Handling FastAPI's validation errors
-  message?: string; // Generic message fallback
+  detail?: string | { msg: string; type: string }[];
+  message?: string;
 }
 
-// Type for SignupForm props, including the function to switch back to login
 interface SignupFormProps {
   switchToLogin: () => void;
 }
@@ -54,7 +52,6 @@ const SignupForm: React.FC<SignupFormProps> = ({ switchToLogin }) => {
     setError("");
     setSuccess("");
 
-    // Basic client-side validation
     if (password.length < 6) {
       setError("Password must be at least 6 characters long.");
       return;
@@ -64,17 +61,18 @@ const SignupForm: React.FC<SignupFormProps> = ({ switchToLogin }) => {
       return;
     }
     if (!/\S+@\S+\.\S+/.test(email)) {
-      // Simple email format check
       setError("Please enter a valid email address.");
       return;
     }
-    // Add phone validation if needed
-    var created_at=new Date().toISOString(); // Set created_at to current date/time
 
     setLoading(true);
 
-    // NOTE: Backend should handle created_at. Remove from payload.
-    const payload = { name, email, password, phone, created_at};
+    const payload = {
+      name: name.trim(),
+      email: email.trim(),
+      password,
+      phone: phone.trim() || null,
+    }; // Backend handles created_at
 
     try {
       const response = await axios.post<SignupSuccessResponse>(
@@ -90,33 +88,30 @@ const SignupForm: React.FC<SignupFormProps> = ({ switchToLogin }) => {
 
       if (response.data?.status === "success") {
         setSuccess("Account created successfully! Redirecting to login...");
-        // Clear the form
         setName("");
         setEmail("");
         setPassword("");
         setPhone("");
-        // Automatically switch to login form after a short delay
         setTimeout(() => {
           switchToLogin();
-        }, 2000); // 2-second delay
+        }, 2000);
       } else {
         setError(
           response.data.message || "Signup failed. Unexpected response format."
         );
       }
     } catch (err) {
-      const error = err as AxiosError<ApiErrorResponse>; // Type assertion
+      const error = err as AxiosError<ApiErrorResponse>;
       console.error("Signup Error:", error.response?.data || error.message);
 
       if (error.response) {
         const status = error.response.status;
         const responseData = error.response.data;
 
-        if (status === 400) {
-          // Bad Request (often validation or user exists)
+        if (status === 400 || status === 422) {
+          // Include 422 for validation
           if (responseData?.detail) {
             if (typeof responseData.detail === "string") {
-              // Check specific FastAPI "User already exists" message
               if (
                 responseData.detail
                   .toLowerCase()
@@ -124,13 +119,12 @@ const SignupForm: React.FC<SignupFormProps> = ({ switchToLogin }) => {
               ) {
                 setError("This email address is already registered.");
               } else {
-                setError(responseData.detail); // Show other string detail messages
+                setError(responseData.detail);
               }
             } else if (
               Array.isArray(responseData.detail) &&
               responseData.detail.length > 0
             ) {
-              // Show the first validation message from FastAPI
               setError(
                 `Validation Error: ${responseData.detail[0].msg}` ||
                   "Please check your input."
@@ -160,6 +154,9 @@ const SignupForm: React.FC<SignupFormProps> = ({ switchToLogin }) => {
     }
   };
 
+  const inputBaseClass =
+    "appearance-none relative block w-full px-3 py-2 pl-10 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-primary focus:border-primary sm:text-sm dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-light dark:focus:border-primary-light";
+
   return (
     <form className="mt-8 space-y-4" onSubmit={handleSubmit}>
       {error && (
@@ -180,7 +177,6 @@ const SignupForm: React.FC<SignupFormProps> = ({ switchToLogin }) => {
       )}
       <input type="hidden" name="remember" defaultValue="true" />
       <div className="rounded-md shadow-sm space-y-3">
-        {/* Name Input */}
         <div>
           <label htmlFor="name-signup" className="sr-only">
             Full Name
@@ -195,7 +191,7 @@ const SignupForm: React.FC<SignupFormProps> = ({ switchToLogin }) => {
               type="text"
               autoComplete="name"
               required
-              className="appearance-none relative block w-full px-3 py-2 pl-10 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-primary focus:border-primary sm:text-sm dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-light dark:focus:border-primary-light"
+              className={inputBaseClass}
               placeholder="Full Name"
               value={name}
               onChange={handleInputChange(setName)}
@@ -203,7 +199,6 @@ const SignupForm: React.FC<SignupFormProps> = ({ switchToLogin }) => {
             />
           </div>
         </div>
-        {/* Email Input */}
         <div>
           <label htmlFor="email-address-signup" className="sr-only">
             Email address
@@ -218,7 +213,7 @@ const SignupForm: React.FC<SignupFormProps> = ({ switchToLogin }) => {
               type="email"
               autoComplete="email"
               required
-              className="appearance-none relative block w-full px-3 py-2 pl-10 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-primary focus:border-primary sm:text-sm dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-light dark:focus:border-primary-light"
+              className={inputBaseClass}
               placeholder="Email address"
               value={email}
               onChange={handleInputChange(setEmail)}
@@ -226,10 +221,9 @@ const SignupForm: React.FC<SignupFormProps> = ({ switchToLogin }) => {
             />
           </div>
         </div>
-        {/* Phone Input */}
         <div>
           <label htmlFor="phone-signup" className="sr-only">
-            Phone Number
+            Phone Number (Optional)
           </label>
           <div className="relative">
             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -240,16 +234,14 @@ const SignupForm: React.FC<SignupFormProps> = ({ switchToLogin }) => {
               name="phone"
               type="tel"
               autoComplete="tel"
-              required
-              className="appearance-none relative block w-full px-3 py-2 pl-10 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-primary focus:border-primary sm:text-sm dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-light dark:focus:border-primary-light"
-              placeholder="Phone Number"
+              className={inputBaseClass}
+              placeholder="Phone Number (Optional)"
               value={phone}
               onChange={handleInputChange(setPhone)}
               disabled={loading}
             />
           </div>
         </div>
-        {/* Password Input */}
         <div>
           <label htmlFor="password-signup" className="sr-only">
             Password
@@ -264,7 +256,7 @@ const SignupForm: React.FC<SignupFormProps> = ({ switchToLogin }) => {
               type="password"
               autoComplete="new-password"
               required
-              className="appearance-none relative block w-full px-3 py-2 pl-10 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-primary focus:border-primary sm:text-sm dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-light dark:focus:border-primary-light"
+              className={inputBaseClass}
               placeholder="Password (min. 6 characters)"
               value={password}
               onChange={handleInputChange(setPassword)}
@@ -277,7 +269,7 @@ const SignupForm: React.FC<SignupFormProps> = ({ switchToLogin }) => {
       <div>
         <button
           type="submit"
-          disabled={loading || success !== ""} // Disable button also after success message shown
+          disabled={loading || success !== ""}
           className={`group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white ${
             loading || success
               ? "bg-indigo-300 dark:bg-indigo-800 cursor-not-allowed"
