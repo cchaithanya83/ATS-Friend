@@ -14,8 +14,8 @@ cssselect2==0.8.0
 fastapi==0.115.12
 fonttools==4.57.0
 google-ai-generativelanguage==0.6.15
-google-api-core==2.25.0rc0
-google-api-python-client==2.167.0
+google-api-core
+google-api-python-client
 google-auth==2.39.0
 google-auth-httplib2==0.2.0
 google-genai==1.11.0
@@ -57,5 +57,4 @@ weasyprint==65.1
 webencodings==0.5.1
 websockets==15.0.1
 zopfli==0.2.3.post1
-
 uvicorn
