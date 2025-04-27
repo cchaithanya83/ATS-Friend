@@ -683,3 +683,9 @@
 2025-04-27 18:02:36,027 - app.core.logs - INFO - Resume 1 retrieved for user 1
 2025-04-27 18:02:37,671 - app.core.logs - INFO - PDF generated successfully for resume_1_1
 2025-04-27 18:02:37,673 - app.core.logs - INFO - PDF generated for resume 1 of user 1
+2025-04-27 18:15:21,694 - app.core.logs - INFO - Resume 1 retrieved for user 1
+2025-04-27 18:15:23,964 - app.core.logs - INFO - PDF generated successfully for resume_1_1
+2025-04-27 18:15:23,968 - app.core.logs - INFO - PDF generated for resume 1 of user 1
+2025-04-27 18:15:23,976 - app.core.logs - INFO - Resume 1 retrieved for user 1
+2025-04-27 18:15:26,274 - app.core.logs - INFO - PDF generated successfully for resume_1_1
+2025-04-27 18:15:26,277 - app.core.logs - INFO - PDF generated for resume 1 of user 1

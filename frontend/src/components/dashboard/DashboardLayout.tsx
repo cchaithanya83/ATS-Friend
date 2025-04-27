@@ -33,8 +33,8 @@ const DashboardLayout: React.FC = () => {
           isActive || location.pathname.startsWith(`/dashboard/${path}/`),
       });
 
-  const headerHeight = "64px";
-  const footerHeight = "40px"; // Adjust if footer is visible in dashboard
+  //   const headerHeight = "64px";
+  //   const footerHeight = "40px"; // Adjust if footer is visible in dashboard
 
   return (
     <div className="flex h-[calc(100vh-var(--header-height,68px)-var(--footer-height,73px))]  flex-col md:flex-row">
