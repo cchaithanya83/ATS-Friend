@@ -1,0 +1,483 @@
+2025-04-25 13:18:31,130 - app.core.logs - INFO - Starting the FastAPI application
+2025-04-27 14:16:24,621 - app.core.logs - INFO - Starting the FastAPI application
+2025-04-27 14:16:36,546 - app.core.logs - INFO - Login attempt for email: string
+2025-04-27 14:16:36,980 - app.core.database.config - INFO - Successful login for email: string
+2025-04-27 14:16:36,980 - app.core.logs - INFO - User string logged in successfully
+2025-04-27 14:20:22,426 - app.core.logs - INFO - Signup attempt for email: string
+2025-04-27 14:20:22,773 - app.core.database.config - ERROR - Signup failed for email: string - User already exists
+2025-04-27 14:20:22,773 - app.core.logs - ERROR - Signup failed for email: string: User already exists
+2025-04-27 14:21:00,021 - app.core.logs - INFO - Signup attempt for email: string
+2025-04-27 14:21:00,414 - app.core.database.config - ERROR - Signup failed for email: string - User already exists
+2025-04-27 14:21:00,414 - app.core.logs - ERROR - Signup failed for email: string: User already exists
+2025-04-27 14:21:08,057 - app.core.logs - INFO - Signup attempt for email: string1
+2025-04-27 14:21:08,427 - app.core.database.config - INFO - Successful signup for email: string1
+2025-04-27 14:21:08,427 - app.core.logs - INFO - User string1 signed up successfully
+2025-04-27 14:41:44,914 - app.core.logs - INFO - Signup attempt for email: chaithanya@cydratech.com
+2025-04-27 14:41:45,265 - app.core.database.config - INFO - Successful signup for email: chaithanya@cydratech.com
+2025-04-27 14:41:45,266 - app.core.logs - INFO - User chaithanya@cydratech.com signed up successfully
+2025-04-27 14:41:53,586 - app.core.logs - INFO - Login attempt for email: chaithanya@cydratech.com
+2025-04-27 14:41:53,900 - app.core.database.config - INFO - Successful login for email: chaithanya@cydratech.com
+2025-04-27 14:41:53,900 - app.core.logs - INFO - User chaithanya@cydratech.com logged in successfully
+2025-04-27 14:44:39,719 - app.core.logs - ERROR - User 0 not found
+2025-04-27 14:45:04,097 - app.core.logs - ERROR - User 0 not found
+2025-04-27 14:52:09,644 - app.core.logs - INFO - Login attempt for email: chaithanya@cydratech.com
+2025-04-27 14:52:10,018 - app.core.database.config - INFO - Successful login for email: chaithanya@cydratech.com
+2025-04-27 14:52:10,018 - app.core.logs - INFO - User chaithanya@cydratech.com logged in successfully
+2025-04-27 14:59:06,400 - app.core.logs - INFO - Login attempt for email: chaithanya@cydratech.com
+2025-04-27 14:59:06,728 - app.core.database.config - INFO - Successful login for email: chaithanya@cydratech.com
+2025-04-27 14:59:06,728 - app.core.logs - INFO - User chaithanya@cydratech.com logged in successfully
+2025-04-27 14:59:16,899 - app.core.logs - INFO - Login attempt for email: chaithanya@cydratech.com
+2025-04-27 14:59:17,198 - app.core.database.config - INFO - Successful login for email: chaithanya@cydratech.com
+2025-04-27 14:59:17,199 - app.core.logs - INFO - User chaithanya@cydratech.com logged in successfully
+2025-04-27 14:59:34,800 - app.core.logs - INFO - Login attempt for email: chaithanya@cydratech.com
+2025-04-27 14:59:35,160 - app.core.database.config - INFO - Successful login for email: chaithanya@cydratech.com
+2025-04-27 14:59:35,161 - app.core.logs - INFO - User chaithanya@cydratech.com logged in successfully
+2025-04-27 15:00:21,393 - app.core.logs - INFO - Login attempt for email: chaithanya@cydratech.com
+2025-04-27 15:00:21,744 - app.core.database.config - INFO - Successful login for email: chaithanya@cydratech.com
+2025-04-27 15:00:21,745 - app.core.logs - INFO - User chaithanya@cydratech.com logged in successfully
+2025-04-27 15:01:33,499 - app.core.logs - ERROR - No profiles found for user 3
+2025-04-27 15:01:33,505 - app.core.logs - ERROR - No profiles found for user 3
+2025-04-27 15:01:47,889 - app.core.logs - ERROR - No resumes found for user 3
+2025-04-27 15:01:47,895 - app.core.logs - ERROR - No resumes found for user 3
+2025-04-27 15:01:48,888 - app.core.logs - ERROR - No profiles found for user 3
+2025-04-27 15:01:48,893 - app.core.logs - ERROR - No profiles found for user 3
+2025-04-27 15:01:49,488 - app.core.logs - ERROR - No profiles found for user 3
+2025-04-27 15:01:49,494 - app.core.logs - ERROR - No profiles found for user 3
+2025-04-27 15:01:51,852 - app.core.logs - ERROR - No resumes found for user 3
+2025-04-27 15:01:51,858 - app.core.logs - ERROR - No resumes found for user 3
+2025-04-27 15:01:59,759 - app.core.logs - ERROR - No profiles found for user 3
+2025-04-27 15:01:59,764 - app.core.logs - ERROR - No profiles found for user 3
+2025-04-27 15:02:00,895 - app.core.logs - ERROR - No resumes found for user 3
+2025-04-27 15:02:00,899 - app.core.logs - ERROR - No resumes found for user 3
+2025-04-27 15:02:01,447 - app.core.logs - ERROR - No profiles found for user 3
+2025-04-27 15:02:01,451 - app.core.logs - ERROR - No profiles found for user 3
+2025-04-27 15:02:03,409 - app.core.logs - ERROR - No profiles found for user 3
+2025-04-27 15:02:03,448 - app.core.logs - ERROR - No profiles found for user 3
+2025-04-27 15:02:08,409 - app.core.logs - ERROR - No resumes found for user 3
+2025-04-27 15:02:08,417 - app.core.logs - ERROR - No resumes found for user 3
+2025-04-27 15:02:09,263 - app.core.logs - ERROR - No profiles found for user 3
+2025-04-27 15:02:09,270 - app.core.logs - ERROR - No profiles found for user 3
+2025-04-27 15:02:09,901 - app.core.logs - ERROR - No resumes found for user 3
+2025-04-27 15:02:09,906 - app.core.logs - ERROR - No resumes found for user 3
+2025-04-27 15:02:10,386 - app.core.logs - ERROR - No profiles found for user 3
+2025-04-27 15:02:10,390 - app.core.logs - ERROR - No profiles found for user 3
+2025-04-27 15:02:14,190 - app.core.logs - ERROR - No profiles found for user 3
+2025-04-27 15:02:14,199 - app.core.logs - ERROR - No profiles found for user 3
+2025-04-27 15:04:02,250 - app.core.logs - ERROR - No profiles found for user 3
+2025-04-27 15:04:02,258 - app.core.logs - ERROR - No profiles found for user 3
+2025-04-27 15:04:03,222 - app.core.logs - ERROR - No resumes found for user 3
+2025-04-27 15:04:03,228 - app.core.logs - ERROR - No resumes found for user 3
+2025-04-27 15:04:03,770 - app.core.logs - ERROR - No profiles found for user 3
+2025-04-27 15:04:03,775 - app.core.logs - ERROR - No profiles found for user 3
+2025-04-27 15:04:16,588 - app.core.logs - ERROR - No profiles found for user 3
+2025-04-27 15:04:16,597 - app.core.logs - ERROR - No profiles found for user 3
+2025-04-27 15:04:51,187 - app.core.logs - ERROR - No profiles found for user 3
+2025-04-27 15:04:51,196 - app.core.logs - ERROR - No profiles found for user 3
+2025-04-27 15:04:54,008 - app.core.logs - ERROR - No resumes found for user 3
+2025-04-27 15:04:54,015 - app.core.logs - ERROR - No resumes found for user 3
+2025-04-27 15:04:54,573 - app.core.logs - ERROR - No profiles found for user 3
+2025-04-27 15:04:54,578 - app.core.logs - ERROR - No profiles found for user 3
+2025-04-27 15:06:17,526 - app.core.logs - ERROR - No profiles found for user 3
+2025-04-27 15:06:38,526 - app.core.logs - ERROR - No profiles found for user 3
+2025-04-27 15:06:52,525 - app.core.logs - ERROR - No profiles found for user 3
+2025-04-27 15:07:00,553 - app.core.logs - ERROR - No profiles found for user 3
+2025-04-27 15:07:08,533 - app.core.logs - ERROR - No profiles found for user 3
+2025-04-27 15:07:15,522 - app.core.logs - ERROR - No profiles found for user 3
+2025-04-27 15:07:21,521 - app.core.logs - ERROR - No profiles found for user 3
+2025-04-27 15:07:28,528 - app.core.logs - ERROR - No profiles found for user 3
+2025-04-27 15:07:45,719 - app.core.database.config - INFO - Profile created successfully for user_id: 3
+2025-04-27 15:07:45,719 - app.core.logs - INFO - Profile created for user 3
+2025-04-27 15:08:01,953 - app.core.logs - INFO - Profiles retrieved for user 3
+2025-04-27 15:08:01,961 - app.core.logs - INFO - Profiles retrieved for user 3
+2025-04-27 15:08:42,552 - app.core.logs - INFO - Profiles retrieved for user 3
+2025-04-27 15:08:52,522 - app.core.logs - INFO - Profiles retrieved for user 3
+2025-04-27 15:08:59,528 - app.core.logs - INFO - Profiles retrieved for user 3
+2025-04-27 15:09:10,530 - app.core.logs - INFO - Profiles retrieved for user 3
+2025-04-27 15:09:17,382 - app.core.logs - INFO - Profiles retrieved for user 3
+2025-04-27 15:09:17,389 - app.core.logs - INFO - Profiles retrieved for user 3
+2025-04-27 15:09:52,577 - app.core.logs - INFO - Profiles retrieved for user 3
+2025-04-27 15:09:56,624 - app.core.logs - INFO - Profiles retrieved for user 3
+2025-04-27 15:10:02,764 - app.core.logs - INFO - Profiles retrieved for user 3
+2025-04-27 15:10:20,895 - app.core.logs - INFO - Profiles retrieved for user 3
+2025-04-27 15:10:37,499 - app.core.logs - INFO - Profiles retrieved for user 3
+2025-04-27 15:10:42,127 - app.core.logs - INFO - Profiles retrieved for user 3
+2025-04-27 15:10:51,660 - app.core.logs - INFO - Profiles retrieved for user 3
+2025-04-27 15:11:05,187 - app.core.logs - INFO - Profiles retrieved for user 3
+2025-04-27 15:11:05,197 - app.core.logs - INFO - Profiles retrieved for user 3
+2025-04-27 15:13:28,537 - app.core.logs - INFO - Profiles retrieved for user 3
+2025-04-27 15:13:29,549 - app.core.logs - INFO - Profiles retrieved for user 3
+2025-04-27 15:13:42,526 - app.core.logs - INFO - Profiles retrieved for user 3
+2025-04-27 15:13:51,536 - app.core.logs - INFO - Profiles retrieved for user 3
+2025-04-27 15:13:58,528 - app.core.logs - INFO - Profiles retrieved for user 3
+2025-04-27 15:14:05,535 - app.core.logs - INFO - Profiles retrieved for user 3
+2025-04-27 15:14:22,536 - app.core.logs - INFO - Profiles retrieved for user 3
+2025-04-27 15:14:44,308 - app.core.database.config - INFO - Profile created successfully for user_id: 3
+2025-04-27 15:14:44,311 - app.core.logs - INFO - Profile created for user 3
+2025-04-27 15:14:59,857 - app.core.logs - INFO - Profiles retrieved for user 3
+2025-04-27 15:14:59,863 - app.core.logs - INFO - Profiles retrieved for user 3
+2025-04-27 15:15:23,164 - app.core.logs - INFO - Profiles retrieved for user 3
+2025-04-27 15:15:26,577 - app.core.logs - INFO - Profiles retrieved for user 3
+2025-04-27 15:15:33,043 - app.core.logs - INFO - Profiles retrieved for user 3
+2025-04-27 15:15:37,159 - app.core.logs - INFO - Profiles retrieved for user 3
+2025-04-27 15:15:37,164 - app.core.logs - INFO - Profiles retrieved for user 3
+2025-04-27 15:16:00,912 - app.core.logs - ERROR - No resumes found for user 3
+2025-04-27 15:16:00,919 - app.core.logs - ERROR - No resumes found for user 3
+2025-04-27 15:16:04,400 - app.core.logs - ERROR - No resumes found for user 3
+2025-04-27 15:16:04,405 - app.core.logs - ERROR - No resumes found for user 3
+2025-04-27 15:17:02,397 - app.core.logs - ERROR - No resumes found for user 3
+2025-04-27 15:17:02,402 - app.core.logs - ERROR - No resumes found for user 3
+2025-04-27 15:19:05,047 - app.core.logs - INFO - Profiles retrieved for user 3
+2025-04-27 15:19:05,059 - app.core.logs - INFO - Profiles retrieved for user 3
+2025-04-27 15:21:51,657 - app.core.logs - INFO - Starting the FastAPI application
+2025-04-27 15:27:36,111 - app.core.logs - INFO - Profiles retrieved for user 3
+2025-04-27 15:27:36,126 - app.core.logs - INFO - Profiles retrieved for user 3
+2025-04-27 15:28:43,543 - app.core.logs - INFO - Profiles retrieved for user 3
+2025-04-27 15:28:49,586 - app.core.logs - INFO - Profiles retrieved for user 3
+2025-04-27 15:30:13,564 - app.core.logs - INFO - Profiles retrieved for user 3
+2025-04-27 15:30:17,880 - app.core.logs - INFO - Profiles retrieved for user 3
+2025-04-27 15:30:17,885 - app.core.logs - INFO - Profiles retrieved for user 3
+2025-04-27 15:30:35,781 - google_genai.models - INFO - AFC is enabled with max remote calls: 10.
+2025-04-27 15:30:39,180 - httpx - INFO - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-001:generateContent "HTTP/1.1 200 OK"
+2025-04-27 15:30:39,187 - google_genai.models - INFO - AFC remote call 1 is done.
+2025-04-27 15:30:39,197 - app.core.database.config - INFO - Resume created successfully for user_id: 3
+2025-04-27 15:30:39,198 - app.core.logs - INFO - Resume created for user 3
+2025-04-27 15:30:48,765 - app.core.logs - INFO - All resumes retrieved for user 3
+2025-04-27 15:30:48,771 - app.core.logs - INFO - All resumes retrieved for user 3
+2025-04-27 15:30:50,923 - app.core.logs - INFO - Resume 2 retrieved for user 3
+2025-04-27 15:30:50,931 - app.core.logs - INFO - Resume 2 retrieved for user 3
+2025-04-27 15:31:20,016 - app.core.logs - INFO - Profiles retrieved for user 3
+2025-04-27 15:31:20,025 - app.core.logs - INFO - Profiles retrieved for user 3
+2025-04-27 15:31:56,994 - app.core.logs - INFO - Profiles retrieved for user 3
+2025-04-27 15:32:05,769 - app.core.logs - INFO - Profiles retrieved for user 3
+2025-04-27 15:32:08,244 - app.core.logs - INFO - Profiles retrieved for user 3
+2025-04-27 15:32:26,397 - app.core.logs - INFO - Profiles retrieved for user 3
+2025-04-27 15:32:40,874 - app.core.logs - INFO - Profiles retrieved for user 3
+2025-04-27 15:32:42,902 - app.core.logs - INFO - Profiles retrieved for user 3
+2025-04-27 15:32:44,962 - app.core.logs - INFO - Profiles retrieved for user 3
+2025-04-27 15:32:50,998 - app.core.logs - INFO - Profiles retrieved for user 3
+2025-04-27 15:32:52,813 - app.core.logs - INFO - Profiles retrieved for user 3
+2025-04-27 15:32:55,208 - app.core.logs - INFO - Profiles retrieved for user 3
+2025-04-27 15:34:07,532 - app.core.logs - INFO - Profiles retrieved for user 3
+2025-04-27 15:34:18,540 - app.core.logs - INFO - Profiles retrieved for user 3
+2025-04-27 15:34:23,586 - app.core.logs - INFO - Profiles retrieved for user 3
+2025-04-27 15:34:27,560 - app.core.logs - INFO - Profiles retrieved for user 3
+2025-04-27 15:35:12,097 - app.core.logs - INFO - Profiles retrieved for user 3
+2025-04-27 15:35:12,104 - app.core.logs - INFO - Profiles retrieved for user 3
+2025-04-27 15:35:46,013 - app.core.logs - INFO - Profiles retrieved for user 3
+2025-04-27 15:36:18,787 - app.core.logs - INFO - Profiles retrieved for user 3
+2025-04-27 15:36:40,161 - app.core.logs - INFO - Profiles retrieved for user 3
+2025-04-27 15:36:41,717 - app.core.logs - INFO - Profiles retrieved for user 3
+2025-04-27 15:36:45,445 - app.core.database.config - INFO - Profile created successfully for user_id: 3
+2025-04-27 15:36:45,446 - app.core.logs - INFO - Profile created for user 3
+2025-04-27 15:37:12,805 - app.core.logs - INFO - Profiles retrieved for user 3
+2025-04-27 15:37:21,116 - app.core.logs - INFO - Profiles retrieved for user 3
+2025-04-27 15:37:24,512 - app.core.database.config - INFO - Profile created successfully for user_id: 3
+2025-04-27 15:37:24,517 - app.core.logs - INFO - Profile created for user 3
+2025-04-27 15:37:33,456 - app.core.logs - INFO - Profiles retrieved for user 3
+2025-04-27 15:40:15,617 - app.core.logs - INFO - Profiles retrieved for user 3
+2025-04-27 15:40:16,601 - app.core.logs - INFO - Profiles retrieved for user 3
+2025-04-27 15:41:24,175 - app.core.logs - INFO - All resumes retrieved for user 3
+2025-04-27 15:41:24,182 - app.core.logs - INFO - All resumes retrieved for user 3
+2025-04-27 15:41:27,929 - app.core.logs - INFO - Profiles retrieved for user 3
+2025-04-27 15:41:27,934 - app.core.logs - INFO - Profiles retrieved for user 3
+2025-04-27 15:41:33,363 - google_genai.models - INFO - AFC is enabled with max remote calls: 10.
+2025-04-27 15:41:37,285 - httpx - INFO - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-001:generateContent "HTTP/1.1 200 OK"
+2025-04-27 15:41:37,286 - google_genai.models - INFO - AFC remote call 1 is done.
+2025-04-27 15:41:37,294 - app.core.database.config - INFO - Resume created successfully for user_id: 3
+2025-04-27 15:41:37,295 - app.core.logs - INFO - Resume created for user 3
+2025-04-27 15:41:47,673 - app.core.logs - INFO - All resumes retrieved for user 3
+2025-04-27 15:41:47,681 - app.core.logs - INFO - All resumes retrieved for user 3
+2025-04-27 15:41:48,819 - app.core.logs - INFO - Resume 3 retrieved for user 3
+2025-04-27 15:41:48,827 - app.core.logs - INFO - Resume 3 retrieved for user 3
+2025-04-27 15:41:53,279 - app.core.logs - INFO - All resumes retrieved for user 3
+2025-04-27 15:41:53,284 - app.core.logs - INFO - All resumes retrieved for user 3
+2025-04-27 15:41:57,144 - app.core.logs - INFO - PDF generated successfully for resume_3_3
+2025-04-27 15:41:57,147 - app.core.logs - INFO - PDF generated for resume 3 of user 3
+2025-04-27 15:42:03,533 - app.core.logs - INFO - Resume 3 retrieved for user 3
+2025-04-27 15:42:03,540 - app.core.logs - INFO - Resume 3 retrieved for user 3
+2025-04-27 15:42:11,574 - app.core.logs - INFO - All resumes retrieved for user 3
+2025-04-27 15:42:11,580 - app.core.logs - INFO - All resumes retrieved for user 3
+2025-04-27 15:43:10,347 - app.core.logs - INFO - Resume 2 retrieved for user 3
+2025-04-27 15:43:10,354 - app.core.logs - INFO - Resume 2 retrieved for user 3
+2025-04-27 15:43:11,439 - app.core.logs - INFO - All resumes retrieved for user 3
+2025-04-27 15:43:11,450 - app.core.logs - INFO - All resumes retrieved for user 3
+2025-04-27 15:44:42,296 - app.core.logs - INFO - Profiles retrieved for user 3
+2025-04-27 15:44:42,334 - app.core.logs - INFO - Profiles retrieved for user 3
+2025-04-27 15:44:46,534 - google_genai.models - INFO - AFC is enabled with max remote calls: 10.
+2025-04-27 15:44:49,673 - httpx - INFO - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-001:generateContent "HTTP/1.1 200 OK"
+2025-04-27 15:44:49,678 - google_genai.models - INFO - AFC remote call 1 is done.
+2025-04-27 15:44:49,700 - app.core.database.config - INFO - Resume created successfully for user_id: 3
+2025-04-27 15:44:49,701 - app.core.logs - INFO - Resume created for user 3
+2025-04-27 15:44:58,481 - app.core.logs - INFO - All resumes retrieved for user 3
+2025-04-27 15:44:58,486 - app.core.logs - INFO - All resumes retrieved for user 3
+2025-04-27 15:45:02,410 - app.core.logs - INFO - Resume 2 retrieved for user 3
+2025-04-27 15:45:02,414 - app.core.logs - INFO - Resume 2 retrieved for user 3
+2025-04-27 15:46:37,545 - app.core.logs - INFO - Resume 2 retrieved for user 3
+2025-04-27 15:46:43,373 - app.core.logs - INFO - All resumes retrieved for user 3
+2025-04-27 15:46:43,382 - app.core.logs - INFO - All resumes retrieved for user 3
+2025-04-27 15:46:44,777 - app.core.logs - INFO - Resume 2 retrieved for user 3
+2025-04-27 15:46:44,786 - app.core.logs - INFO - Resume 2 retrieved for user 3
+2025-04-27 15:46:47,370 - app.core.logs - INFO - All resumes retrieved for user 3
+2025-04-27 15:46:47,388 - app.core.logs - INFO - All resumes retrieved for user 3
+2025-04-27 15:46:48,377 - app.core.logs - INFO - Resume 3 retrieved for user 3
+2025-04-27 15:46:48,387 - app.core.logs - INFO - Resume 3 retrieved for user 3
+2025-04-27 15:46:51,904 - app.core.logs - INFO - All resumes retrieved for user 3
+2025-04-27 15:46:51,912 - app.core.logs - INFO - All resumes retrieved for user 3
+2025-04-27 15:46:53,952 - app.core.logs - INFO - Profiles retrieved for user 3
+2025-04-27 15:46:53,960 - app.core.logs - INFO - Profiles retrieved for user 3
+2025-04-27 15:46:58,568 - google_genai.models - INFO - AFC is enabled with max remote calls: 10.
+2025-04-27 15:47:01,994 - httpx - INFO - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-001:generateContent "HTTP/1.1 200 OK"
+2025-04-27 15:47:01,995 - google_genai.models - INFO - AFC remote call 1 is done.
+2025-04-27 15:47:02,004 - app.core.database.config - INFO - Resume created successfully for user_id: 3
+2025-04-27 15:47:02,005 - app.core.logs - INFO - Resume created for user 3
+2025-04-27 15:47:08,280 - app.core.logs - INFO - All resumes retrieved for user 3
+2025-04-27 15:47:08,290 - app.core.logs - INFO - All resumes retrieved for user 3
+2025-04-27 15:47:09,584 - app.core.logs - INFO - Resume 2 retrieved for user 3
+2025-04-27 15:47:09,595 - app.core.logs - INFO - Resume 2 retrieved for user 3
+2025-04-27 15:47:40,605 - app.core.logs - INFO - Profiles retrieved for user 3
+2025-04-27 15:47:40,611 - app.core.logs - INFO - Profiles retrieved for user 3
+2025-04-27 15:47:41,173 - app.core.logs - INFO - All resumes retrieved for user 3
+2025-04-27 15:47:41,179 - app.core.logs - INFO - All resumes retrieved for user 3
+2025-04-27 15:48:48,070 - app.core.logs - INFO - Profiles retrieved for user 3
+2025-04-27 15:48:48,092 - app.core.logs - INFO - Profiles retrieved for user 3
+2025-04-27 15:48:52,466 - app.core.logs - INFO - Profiles retrieved for user 3
+2025-04-27 15:48:52,483 - app.core.logs - INFO - Profiles retrieved for user 3
+2025-04-27 15:48:59,912 - app.core.logs - INFO - Profiles retrieved for user 3
+2025-04-27 15:48:59,925 - app.core.logs - INFO - Profiles retrieved for user 3
+2025-04-27 15:52:02,246 - app.core.logs - INFO - Profiles retrieved for user 3
+2025-04-27 15:52:02,251 - app.core.logs - INFO - Profiles retrieved for user 3
+2025-04-27 15:52:04,057 - app.core.logs - INFO - All resumes retrieved for user 3
+2025-04-27 15:52:04,063 - app.core.logs - INFO - All resumes retrieved for user 3
+2025-04-27 15:52:05,419 - app.core.logs - INFO - Resume 2 retrieved for user 3
+2025-04-27 15:52:05,424 - app.core.logs - INFO - Resume 2 retrieved for user 3
+2025-04-27 15:52:10,629 - app.core.logs - INFO - Resume 2 retrieved for user 3
+2025-04-27 15:52:10,634 - app.core.logs - INFO - Resume 2 retrieved for user 3
+2025-04-27 15:52:58,210 - app.core.logs - INFO - Resume 2 retrieved for user 3
+2025-04-27 15:53:18,622 - app.core.logs - INFO - Resume 2 retrieved for user 3
+2025-04-27 15:53:23,381 - app.core.logs - INFO - Resume 2 retrieved for user 3
+2025-04-27 15:53:23,388 - app.core.logs - INFO - Resume 2 retrieved for user 3
+2025-04-27 15:53:31,362 - app.core.logs - INFO - Resume 2 retrieved for user 3
+2025-04-27 15:53:38,161 - app.core.logs - INFO - Resume 2 retrieved for user 3
+2025-04-27 15:53:40,880 - app.core.logs - INFO - Resume 2 retrieved for user 3
+2025-04-27 15:53:40,886 - app.core.logs - INFO - Resume 2 retrieved for user 3
+2025-04-27 15:53:46,088 - app.core.logs - INFO - Resume 2 retrieved for user 3
+2025-04-27 15:58:23,467 - app.core.logs - INFO - Profiles retrieved for user 3
+2025-04-27 15:58:23,477 - app.core.logs - INFO - Profiles retrieved for user 3
+2025-04-27 15:58:24,650 - app.core.logs - INFO - All resumes retrieved for user 3
+2025-04-27 15:58:24,656 - app.core.logs - INFO - All resumes retrieved for user 3
+2025-04-27 15:58:25,674 - app.core.logs - INFO - Profiles retrieved for user 3
+2025-04-27 15:58:25,685 - app.core.logs - INFO - Profiles retrieved for user 3
+2025-04-27 15:58:26,766 - app.core.logs - INFO - Profiles retrieved for user 3
+2025-04-27 15:58:26,775 - app.core.logs - INFO - Profiles retrieved for user 3
+2025-04-27 15:58:27,434 - app.core.logs - INFO - All resumes retrieved for user 3
+2025-04-27 15:58:27,439 - app.core.logs - INFO - All resumes retrieved for user 3
+2025-04-27 15:58:28,092 - app.core.logs - INFO - Profiles retrieved for user 3
+2025-04-27 15:58:28,097 - app.core.logs - INFO - Profiles retrieved for user 3
+2025-04-27 15:58:28,664 - app.core.logs - INFO - All resumes retrieved for user 3
+2025-04-27 15:58:28,668 - app.core.logs - INFO - All resumes retrieved for user 3
+2025-04-27 15:58:29,226 - app.core.logs - INFO - Profiles retrieved for user 3
+2025-04-27 15:58:29,233 - app.core.logs - INFO - Profiles retrieved for user 3
+2025-04-27 15:58:29,802 - app.core.logs - INFO - All resumes retrieved for user 3
+2025-04-27 15:58:29,809 - app.core.logs - INFO - All resumes retrieved for user 3
+2025-04-27 15:58:30,245 - app.core.logs - INFO - Profiles retrieved for user 3
+2025-04-27 15:58:30,251 - app.core.logs - INFO - Profiles retrieved for user 3
+2025-04-27 16:00:03,761 - app.core.logs - INFO - All resumes retrieved for user 3
+2025-04-27 16:00:03,766 - app.core.logs - INFO - All resumes retrieved for user 3
+2025-04-27 16:00:05,463 - app.core.logs - INFO - Resume 2 retrieved for user 3
+2025-04-27 16:00:05,468 - app.core.logs - INFO - Resume 2 retrieved for user 3
+2025-04-27 16:00:23,551 - app.core.logs - INFO - Resume 2 retrieved for user 3
+2025-04-27 16:00:26,459 - app.core.logs - INFO - PDF generated successfully for resume_3_2
+2025-04-27 16:00:26,465 - app.core.logs - INFO - PDF generated for resume 2 of user 3
+2025-04-27 16:01:21,764 - app.core.logs - INFO - Profiles retrieved for user 3
+2025-04-27 16:01:21,772 - app.core.logs - INFO - Profiles retrieved for user 3
+2025-04-27 16:01:23,741 - app.core.logs - INFO - All resumes retrieved for user 3
+2025-04-27 16:01:23,747 - app.core.logs - INFO - All resumes retrieved for user 3
+2025-04-27 16:01:25,473 - app.core.logs - INFO - Resume 2 retrieved for user 3
+2025-04-27 16:01:27,247 - app.core.logs - INFO - PDF generated successfully for resume_3_2
+2025-04-27 16:01:27,249 - app.core.logs - INFO - PDF generated for resume 2 of user 3
+2025-04-27 16:01:27,252 - app.core.logs - INFO - Resume 2 retrieved for user 3
+2025-04-27 16:01:28,964 - app.core.logs - INFO - PDF generated successfully for resume_3_2
+2025-04-27 16:01:28,967 - app.core.logs - INFO - PDF generated for resume 2 of user 3
+2025-04-27 16:02:03,976 - app.core.logs - INFO - Resume 2 retrieved for user 3
+2025-04-27 16:02:06,303 - app.core.logs - INFO - PDF generated successfully for resume_3_2
+2025-04-27 16:02:06,305 - app.core.logs - INFO - PDF generated for resume 2 of user 3
+2025-04-27 16:02:15,648 - app.core.logs - INFO - Resume 2 retrieved for user 3
+2025-04-27 16:02:17,441 - app.core.logs - INFO - PDF generated successfully for resume_3_2
+2025-04-27 16:02:17,443 - app.core.logs - INFO - PDF generated for resume 2 of user 3
+2025-04-27 16:02:51,044 - app.core.logs - INFO - Resume 2 retrieved for user 3
+2025-04-27 16:02:53,963 - app.core.logs - INFO - PDF generated successfully for resume_3_2
+2025-04-27 16:02:53,965 - app.core.logs - INFO - PDF generated for resume 2 of user 3
+2025-04-27 16:02:53,971 - app.core.logs - INFO - Resume 2 retrieved for user 3
+2025-04-27 16:02:56,119 - app.core.logs - INFO - PDF generated successfully for resume_3_2
+2025-04-27 16:02:56,121 - app.core.logs - INFO - PDF generated for resume 2 of user 3
+2025-04-27 16:02:56,126 - app.core.logs - INFO - Resume 2 retrieved for user 3
+2025-04-27 16:02:57,696 - app.core.logs - INFO - PDF generated successfully for resume_3_2
+2025-04-27 16:02:57,698 - app.core.logs - INFO - PDF generated for resume 2 of user 3
+2025-04-27 16:03:04,477 - app.core.logs - INFO - Resume 2 retrieved for user 3
+2025-04-27 16:03:06,832 - app.core.logs - INFO - PDF generated successfully for resume_3_2
+2025-04-27 16:03:06,834 - app.core.logs - INFO - PDF generated for resume 2 of user 3
+2025-04-27 16:03:08,351 - app.core.logs - INFO - Resume 2 retrieved for user 3
+2025-04-27 16:03:10,289 - app.core.logs - INFO - PDF generated successfully for resume_3_2
+2025-04-27 16:03:10,291 - app.core.logs - INFO - PDF generated for resume 2 of user 3
+2025-04-27 16:03:15,024 - app.core.logs - INFO - Resume 2 retrieved for user 3
+2025-04-27 16:03:16,497 - app.core.logs - INFO - PDF generated successfully for resume_3_2
+2025-04-27 16:03:16,499 - app.core.logs - INFO - PDF generated for resume 2 of user 3
+2025-04-27 16:03:19,712 - app.core.logs - INFO - Profiles retrieved for user 3
+2025-04-27 16:03:19,724 - app.core.logs - INFO - Profiles retrieved for user 3
+2025-04-27 16:03:40,841 - app.core.database.config - INFO - Profile created successfully for user_id: 3
+2025-04-27 16:03:40,842 - app.core.logs - INFO - Profile created for user 3
+2025-04-27 16:03:43,719 - app.core.logs - INFO - All resumes retrieved for user 3
+2025-04-27 16:03:43,726 - app.core.logs - INFO - All resumes retrieved for user 3
+2025-04-27 16:03:45,785 - app.core.logs - INFO - Profiles retrieved for user 3
+2025-04-27 16:03:45,794 - app.core.logs - INFO - Profiles retrieved for user 3
+2025-04-27 16:03:49,450 - google_genai.models - INFO - AFC is enabled with max remote calls: 10.
+2025-04-27 16:03:52,804 - httpx - INFO - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-001:generateContent "HTTP/1.1 200 OK"
+2025-04-27 16:03:52,806 - google_genai.models - INFO - AFC remote call 1 is done.
+2025-04-27 16:03:52,814 - app.core.database.config - INFO - Resume created successfully for user_id: 3
+2025-04-27 16:03:52,818 - app.core.logs - INFO - Resume created for user 3
+2025-04-27 16:06:08,774 - app.core.logs - INFO - All resumes retrieved for user 3
+2025-04-27 16:06:08,781 - app.core.logs - INFO - All resumes retrieved for user 3
+2025-04-27 16:06:10,267 - app.core.logs - INFO - Resume 2 retrieved for user 3
+2025-04-27 16:06:10,272 - app.core.logs - INFO - Resume 2 retrieved for user 3
+2025-04-27 16:06:11,786 - app.core.logs - INFO - PDF generated successfully for resume_3_2
+2025-04-27 16:06:11,788 - app.core.logs - INFO - PDF generated for resume 2 of user 3
+2025-04-27 16:06:13,201 - app.core.logs - INFO - PDF generated successfully for resume_3_2
+2025-04-27 16:06:13,203 - app.core.logs - INFO - PDF generated for resume 2 of user 3
+2025-04-27 16:06:33,511 - app.core.logs - INFO - Profiles retrieved for user 3
+2025-04-27 16:06:33,516 - app.core.logs - INFO - Profiles retrieved for user 3
+2025-04-27 16:06:34,185 - app.core.logs - INFO - All resumes retrieved for user 3
+2025-04-27 16:06:34,190 - app.core.logs - INFO - All resumes retrieved for user 3
+2025-04-27 16:07:42,112 - app.core.logs - INFO - All resumes retrieved for user 3
+2025-04-27 16:07:42,118 - app.core.logs - INFO - All resumes retrieved for user 3
+2025-04-27 16:07:46,015 - app.core.logs - INFO - Resume 2 retrieved for user 3
+2025-04-27 16:07:47,681 - app.core.logs - INFO - PDF generated successfully for resume_3_2
+2025-04-27 16:07:47,683 - app.core.logs - INFO - PDF generated for resume 2 of user 3
+2025-04-27 16:07:47,686 - app.core.logs - INFO - Resume 2 retrieved for user 3
+2025-04-27 16:07:49,150 - app.core.logs - INFO - PDF generated successfully for resume_3_2
+2025-04-27 16:07:49,152 - app.core.logs - INFO - PDF generated for resume 2 of user 3
+2025-04-27 16:08:07,197 - app.core.logs - INFO - Profiles retrieved for user 3
+2025-04-27 16:08:07,203 - app.core.logs - INFO - Profiles retrieved for user 3
+2025-04-27 16:08:07,704 - app.core.logs - INFO - Profiles retrieved for user 3
+2025-04-27 16:08:07,710 - app.core.logs - INFO - Profiles retrieved for user 3
+2025-04-27 16:08:08,228 - app.core.logs - INFO - All resumes retrieved for user 3
+2025-04-27 16:08:08,234 - app.core.logs - INFO - All resumes retrieved for user 3
+2025-04-27 16:09:17,688 - app.core.logs - INFO - Resume 2 retrieved for user 3
+2025-04-27 16:09:19,368 - app.core.logs - INFO - PDF generated successfully for resume_3_2
+2025-04-27 16:09:19,371 - app.core.logs - INFO - PDF generated for resume 2 of user 3
+2025-04-27 16:09:19,374 - app.core.logs - INFO - Resume 2 retrieved for user 3
+2025-04-27 16:09:21,362 - app.core.logs - INFO - PDF generated successfully for resume_3_2
+2025-04-27 16:09:21,365 - app.core.logs - INFO - PDF generated for resume 2 of user 3
+2025-04-27 16:09:42,346 - app.core.logs - INFO - Resume 2 retrieved for user 3
+2025-04-27 16:09:44,051 - app.core.logs - INFO - PDF generated successfully for resume_3_2
+2025-04-27 16:09:44,055 - app.core.logs - INFO - PDF generated for resume 2 of user 3
+2025-04-27 16:09:44,059 - app.core.logs - INFO - Resume 2 retrieved for user 3
+2025-04-27 16:09:45,686 - app.core.logs - INFO - PDF generated successfully for resume_3_2
+2025-04-27 16:09:45,687 - app.core.logs - INFO - PDF generated for resume 2 of user 3
+2025-04-27 16:11:05,733 - app.core.logs - INFO - Profiles retrieved for user 3
+2025-04-27 16:11:05,739 - app.core.logs - INFO - Profiles retrieved for user 3
+2025-04-27 16:11:06,434 - app.core.logs - INFO - Profiles retrieved for user 3
+2025-04-27 16:11:06,440 - app.core.logs - INFO - Profiles retrieved for user 3
+2025-04-27 16:11:08,568 - app.core.logs - INFO - All resumes retrieved for user 3
+2025-04-27 16:11:08,572 - app.core.logs - INFO - All resumes retrieved for user 3
+2025-04-27 16:11:09,064 - app.core.logs - INFO - Profiles retrieved for user 3
+2025-04-27 16:11:09,093 - app.core.logs - INFO - Profiles retrieved for user 3
+2025-04-27 16:11:09,923 - app.core.logs - INFO - Profiles retrieved for user 3
+2025-04-27 16:11:09,929 - app.core.logs - INFO - Profiles retrieved for user 3
+2025-04-27 16:11:11,064 - app.core.logs - INFO - All resumes retrieved for user 3
+2025-04-27 16:11:11,067 - app.core.logs - INFO - All resumes retrieved for user 3
+2025-04-27 16:11:11,761 - app.core.logs - INFO - Profiles retrieved for user 3
+2025-04-27 16:11:11,766 - app.core.logs - INFO - Profiles retrieved for user 3
+2025-04-27 16:11:19,737 - google_genai.models - INFO - AFC is enabled with max remote calls: 10.
+2025-04-27 16:11:22,963 - httpx - INFO - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-001:generateContent "HTTP/1.1 200 OK"
+2025-04-27 16:11:22,964 - google_genai.models - INFO - AFC remote call 1 is done.
+2025-04-27 16:11:22,973 - app.core.database.config - INFO - Resume created successfully for user_id: 3
+2025-04-27 16:11:22,973 - app.core.logs - INFO - Resume created for user 3
+2025-04-27 16:11:42,400 - app.core.logs - INFO - Profiles retrieved for user 3
+2025-04-27 16:11:42,406 - app.core.logs - INFO - Profiles retrieved for user 3
+2025-04-27 16:11:47,945 - google_genai.models - INFO - AFC is enabled with max remote calls: 10.
+2025-04-27 16:11:51,168 - httpx - INFO - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-001:generateContent "HTTP/1.1 200 OK"
+2025-04-27 16:11:51,171 - google_genai.models - INFO - AFC remote call 1 is done.
+2025-04-27 16:11:51,178 - app.core.database.config - INFO - Resume created successfully for user_id: 3
+2025-04-27 16:11:51,179 - app.core.logs - INFO - Resume created for user 3
+2025-04-27 16:12:55,992 - google_genai.models - INFO - AFC is enabled with max remote calls: 10.
+2025-04-27 16:12:59,143 - httpx - INFO - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-001:generateContent "HTTP/1.1 200 OK"
+2025-04-27 16:12:59,147 - google_genai.models - INFO - AFC remote call 1 is done.
+2025-04-27 16:12:59,154 - app.core.database.config - INFO - Resume created successfully for user_id: 3
+2025-04-27 16:12:59,154 - app.core.logs - INFO - Resume created for user 3
+2025-04-27 16:15:06,822 - google_genai.models - INFO - AFC is enabled with max remote calls: 10.
+2025-04-27 16:15:10,140 - httpx - INFO - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-001:generateContent "HTTP/1.1 200 OK"
+2025-04-27 16:15:10,142 - google_genai.models - INFO - AFC remote call 1 is done.
+2025-04-27 16:15:10,151 - app.core.database.config - INFO - Resume created successfully for user_id: 3
+2025-04-27 16:15:10,151 - app.core.logs - INFO - Resume created for user 3
+2025-04-27 16:15:10,212 - app.core.logs - INFO - Resume 10 retrieved for user 3
+2025-04-27 16:15:11,725 - app.core.logs - INFO - PDF generated successfully for resume_3_10
+2025-04-27 16:15:11,728 - app.core.logs - INFO - PDF generated for resume 10 of user 3
+2025-04-27 16:15:11,734 - app.core.logs - INFO - Resume 10 retrieved for user 3
+2025-04-27 16:15:13,508 - app.core.logs - INFO - PDF generated successfully for resume_3_10
+2025-04-27 16:15:13,511 - app.core.logs - INFO - PDF generated for resume 10 of user 3
+2025-04-27 16:15:20,948 - app.core.logs - INFO - Profiles retrieved for user 3
+2025-04-27 16:15:20,955 - app.core.logs - INFO - Profiles retrieved for user 3
+2025-04-27 16:15:22,805 - app.core.logs - INFO - All resumes retrieved for user 3
+2025-04-27 16:15:22,863 - app.core.logs - INFO - All resumes retrieved for user 3
+2025-04-27 16:15:23,227 - app.core.logs - INFO - Profiles retrieved for user 3
+2025-04-27 16:15:23,233 - app.core.logs - INFO - Profiles retrieved for user 3
+2025-04-27 16:15:24,134 - app.core.logs - INFO - All resumes retrieved for user 3
+2025-04-27 16:15:24,141 - app.core.logs - INFO - All resumes retrieved for user 3
+2025-04-27 16:15:24,585 - app.core.logs - INFO - Profiles retrieved for user 3
+2025-04-27 16:15:24,590 - app.core.logs - INFO - Profiles retrieved for user 3
+2025-04-27 16:15:31,321 - app.core.logs - INFO - Profiles retrieved for user 3
+2025-04-27 16:15:31,328 - app.core.logs - INFO - Profiles retrieved for user 3
+2025-04-27 16:15:32,696 - app.core.logs - INFO - All resumes retrieved for user 3
+2025-04-27 16:15:32,700 - app.core.logs - INFO - All resumes retrieved for user 3
+2025-04-27 16:15:33,205 - app.core.logs - INFO - Profiles retrieved for user 3
+2025-04-27 16:15:33,211 - app.core.logs - INFO - Profiles retrieved for user 3
+2025-04-27 16:15:34,348 - app.core.logs - INFO - Profiles retrieved for user 3
+2025-04-27 16:15:34,353 - app.core.logs - INFO - Profiles retrieved for user 3
+2025-04-27 16:15:34,834 - app.core.logs - INFO - All resumes retrieved for user 3
+2025-04-27 16:15:34,838 - app.core.logs - INFO - All resumes retrieved for user 3
+2025-04-27 16:15:35,619 - app.core.logs - INFO - Profiles retrieved for user 3
+2025-04-27 16:15:35,623 - app.core.logs - INFO - Profiles retrieved for user 3
+2025-04-27 16:15:58,930 - app.core.logs - INFO - Starting the FastAPI application
+2025-04-27 16:16:29,316 - app.core.logs - INFO - Login attempt for email: chaithanya@cydratech.com
+2025-04-27 16:16:29,318 - app.core.database.config - WARNING - Failed login attempt for email: chaithanya@cydratech.com
+2025-04-27 16:16:29,318 - app.core.logs - WARNING - Failed login for email: chaithanya@cydratech.com
+2025-04-27 16:16:38,899 - app.core.logs - INFO - Signup attempt for email: chaithanya@cydratech.com
+2025-04-27 16:16:39,229 - app.core.database.config - INFO - Successful signup for email: chaithanya@cydratech.com
+2025-04-27 16:16:39,229 - app.core.logs - INFO - User chaithanya@cydratech.com signed up successfully
+2025-04-27 16:16:47,205 - app.core.logs - INFO - Login attempt for email: chaithanya@cydratech.com
+2025-04-27 16:16:47,493 - app.core.database.config - INFO - Successful login for email: chaithanya@cydratech.com
+2025-04-27 16:16:47,493 - app.core.logs - INFO - User chaithanya@cydratech.com logged in successfully
+2025-04-27 16:22:35,836 - app.core.logs - INFO - Starting the FastAPI application
+2025-04-27 16:23:01,379 - app.core.logs - INFO - Update settings request for user ID: 1
+2025-04-27 16:23:01,390 - app.core.database.config - INFO - User ID: 1 updated successfully. Fields: ['phone']
+2025-04-27 16:23:01,391 - app.core.logs - INFO - Settings updated successfully for user ID: 1
+2025-04-27 16:23:45,102 - app.core.logs - INFO - Update settings request for user ID: 1
+2025-04-27 16:23:45,612 - app.core.database.config - INFO - User ID: 1 updated successfully. Fields: ['phone', 'password']
+2025-04-27 16:23:45,617 - app.core.logs - INFO - Settings updated successfully for user ID: 1
+2025-04-27 16:26:01,509 - app.core.logs - INFO - Update settings request for user ID: 1
+2025-04-27 16:26:01,961 - app.core.database.config - INFO - User ID: 1 updated successfully. Fields: ['phone', 'password']
+2025-04-27 16:26:01,962 - app.core.logs - INFO - Settings updated successfully for user ID: 1
+2025-04-27 16:26:14,989 - app.core.logs - INFO - Update settings request for user ID: 1
+2025-04-27 16:26:15,408 - app.core.database.config - INFO - User ID: 1 updated successfully. Fields: ['password']
+2025-04-27 16:26:15,409 - app.core.logs - INFO - Settings updated successfully for user ID: 1
+2025-04-27 16:26:38,621 - app.core.logs - INFO - Login attempt for email: chaithanya@cydratech.com
+2025-04-27 16:26:39,029 - app.core.database.config - WARNING - Failed login attempt for email: chaithanya@cydratech.com
+2025-04-27 16:26:39,029 - app.core.logs - WARNING - Failed login for email: chaithanya@cydratech.com
+2025-04-27 16:26:41,479 - app.core.logs - INFO - Login attempt for email: chaithanya@cydratech.com
+2025-04-27 16:26:41,834 - app.core.database.config - INFO - Successful login for email: chaithanya@cydratech.com
+2025-04-27 16:26:41,835 - app.core.logs - INFO - User chaithanya@cydratech.com logged in successfully
+2025-04-27 16:30:35,911 - app.core.database.config - INFO - Profile created successfully for user_id: 1
+2025-04-27 16:30:35,912 - app.core.logs - INFO - Profile created for user 1
+2025-04-27 16:30:39,126 - app.core.logs - INFO - Profiles retrieved for user 1
+2025-04-27 16:30:39,130 - app.core.logs - INFO - Profiles retrieved for user 1
+2025-04-27 16:31:13,651 - google_genai.models - INFO - AFC is enabled with max remote calls: 10.
+2025-04-27 16:31:19,187 - httpx - INFO - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-001:generateContent "HTTP/1.1 200 OK"
+2025-04-27 16:31:19,194 - google_genai.models - INFO - AFC remote call 1 is done.
+2025-04-27 16:31:19,201 - app.core.database.config - INFO - Resume created successfully for user_id: 1
+2025-04-27 16:31:19,201 - app.core.logs - INFO - Resume created for user 1
+2025-04-27 16:31:19,237 - app.core.logs - INFO - Resume 1 retrieved for user 1
+2025-04-27 16:31:20,768 - app.core.logs - INFO - PDF generated successfully for resume_1_1
+2025-04-27 16:31:20,771 - app.core.logs - INFO - PDF generated for resume 1 of user 1
+2025-04-27 16:31:20,774 - app.core.logs - INFO - Resume 1 retrieved for user 1
+2025-04-27 16:31:22,420 - app.core.logs - INFO - PDF generated successfully for resume_1_1
+2025-04-27 16:31:22,425 - app.core.logs - INFO - PDF generated for resume 1 of user 1

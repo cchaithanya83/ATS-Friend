@@ -4,7 +4,7 @@ from fastapi.responses import StreamingResponse
 from pydantic import BaseModel
 from app.core.database import UserRepository, ProfileRepository, ResumeRepository
 from app.core.service import create_resume, convert_latex_to_pdf
-from app.api.models import LoginModel, NewResume, SignUpModel, profileModel
+from app.api.models import LoginModel, NewResume, SignUpModel, UpdateUserSettingsModel, profileModel
 from app.core.logs import logger
 
 api_routes = FastAPI()
@@ -84,6 +84,47 @@ async def get_user(user_id: int, user_repo: UserRepository = Depends(get_user_re
     logger.error(f"User {user_id} not found")
     raise HTTPException(status_code=404, detail="User not found")
 
+@api_routes.patch("/user/{user_id}", response_model=ApiResponse)
+async def update_user_settings(
+    user_id: int,
+    update_payload: UpdateUserSettingsModel,
+    user_repo: UserRepository = Depends(get_user_repo)
+):
+
+    logger.info(f"Update settings request for user ID: {user_id}")
+
+    existing_user = user_repo.get_by_id(user_id)
+    if not existing_user:
+        logger.error(f"Update settings failed: User {user_id} not found")
+        raise HTTPException(status_code=404, detail="User not found")
+
+    update_data = update_payload.dict(exclude_unset=True)
+
+
+    if 'phone' in update_data and update_data['phone'] == "":
+        update_data['phone'] = None # Store None in DB for empty phone
+
+    if not update_data:
+         logger.warning(f"No update data provided in the request for user ID: {user_id}")
+
+    result = user_repo.update(user_id, update_data)
+
+    if result["status"] == "success":
+        logger.info(f"Settings updated successfully for user ID: {user_id}")
+        updated_user_data = user_repo.get_by_id(user_id)
+        if updated_user_data and 'password' in updated_user_data:
+             del updated_user_data['password']
+
+        return ApiResponse(status="success", message=result.get("message", "Settings updated"), data={"user": updated_user_data})
+    else:
+        logger.error(f"Failed to update settings for user ID: {user_id}: {result['message']}")
+        if "not found" in result.get("message", "").lower():
+             status_code = 404
+        elif "database error" in result.get("message", "").lower():
+             status_code = 500 
+        raise HTTPException(status_code=status_code, detail=result.get("message", "Failed to update settings"))
+
+
 @api_routes.post("/profile", response_model=ApiResponse)
 async def new_profile(profile: profileModel, user_repo: UserRepository = Depends(get_user_repo), profile_repo: ProfileRepository = Depends(get_profile_repo)):
     if not user_repo.get_by_id(profile.user_id):
@@ -103,6 +144,8 @@ async def get_profile_by_userid(user_id: int, profile_repo: ProfileRepository = 
     if profiles:
         logger.info(f"Profiles retrieved for user {user_id}")
         return ApiResponse(status="success", data={"profiles": profiles})
+    else:
+        return ApiResponse(status="success", data={"profiles": []})
     logger.error(f"No profiles found for user {user_id}")
     raise HTTPException(status_code=404, detail="User profiles not found")
 
@@ -146,5 +189,7 @@ async def get_all_resume_by_userid(user_id: int, resume_repo: ResumeRepository =
     if resumes:
         logger.info(f"All resumes retrieved for user {user_id}")
         return ApiResponse(status="success", data={"resumes": resumes})
+    else:
+        return ApiResponse(status="success", data={"resumes": []})
     logger.error(f"No resumes found for user {user_id}")
     raise HTTPException(status_code=404, detail="User resumes not found")

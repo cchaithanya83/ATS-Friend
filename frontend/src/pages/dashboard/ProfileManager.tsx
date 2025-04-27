@@ -1,0 +1,644 @@
+// src/pages/dashboard/ProfileManager.tsx
+import React, { useState, useEffect, useCallback } from "react";
+import { fetchProfiles, createProfile, getUserId } from "../../services/api"; // Adjust path
+import { ProfileModel } from "../../types/api"; // Adjust path
+import LoadingSpinner from "../../components/common/LoadingSpinner"; // Adjust path
+import {
+  PlusCircleIcon,
+  UserCircleIcon,
+  MapPinIcon,
+  AcademicCapIcon,
+  BriefcaseIcon,
+  WrenchScrewdriverIcon,
+  BookOpenIcon,
+  LanguageIcon,
+  HeartIcon,
+  IdentificationIcon,
+} from "@heroicons/react/24/outline";
+
+// *** STEP 1: Update ProfileFormData interface ***
+interface ProfileFormData {
+  profile_name: string;
+  name: string;
+  email: string;
+  phone?: string;
+  address?: string;
+  education?: string; // Changed to optional string
+  experience?: string; // Changed to optional string
+  skills?: string; // Changed to optional string
+  certifications?: string; // Changed to optional string
+  projects?: string; // Changed to optional string
+  languages?: string; // Changed to optional string
+  hobbies?: string; // Changed to optional string
+  created_at?: string; // Optional: ISO string for creation date
+}
+
+const ProfileManager: React.FC = () => {
+  const [profiles, setProfiles] = useState<ProfileModel[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string>("");
+  const [showAddForm, setShowAddForm] = useState<boolean>(false);
+  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
+  const [formError, setFormError] = useState<string>("");
+
+  // *** STEP 2: Update formData state initialization ***
+  const initialFormData: ProfileFormData = {
+    profile_name: "",
+    name: "",
+    email: "",
+    phone: "",
+    address: "",
+    education: "",
+    experience: "",
+    skills: "",
+    certifications: "",
+    projects: "",
+    languages: "",
+    hobbies: "",
+    created_at: new Date().toISOString(), // Optional: Set default created_at to now
+  };
+  const [formData, setFormData] = useState<ProfileFormData>(initialFormData);
+
+  const userId = getUserId();
+
+  const loadProfiles = useCallback(async () => {
+    if (!userId) {
+      setError("User not found. Please log in again.");
+      setLoading(false);
+      return;
+    }
+    setError("");
+    setLoading(true);
+    try {
+      const data = await fetchProfiles(userId);
+      setProfiles(data);
+    } catch (err) {
+      console.error("Error in loadProfiles callback:", err);
+      setError(err instanceof Error ? err.message : "Failed to load profiles.");
+    } finally {
+      setLoading(false);
+    }
+  }, [userId]);
+
+  useEffect(() => {
+    loadProfiles();
+  }, [loadProfiles]);
+
+  // *** STEP 4: handleInputChange already handles textarea ***
+  const handleInputChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement> // Handles both
+  ) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleAddProfileSubmit = async (
+    e: React.FormEvent<HTMLFormElement>
+  ) => {
+    e.preventDefault();
+    if (!userId) {
+      setFormError("Cannot create profile: User not logged in.");
+      return;
+    }
+    if (
+      !formData.profile_name.trim() ||
+      !formData.name.trim() ||
+      !formData.email.trim()
+    ) {
+      setFormError("Profile Nickname, Your Name, and Email are required.");
+      return;
+    }
+
+    setIsSubmitting(true);
+    setFormError("");
+
+    // *** STEP 5: Update profilePayload construction ***
+    const profilePayload: Omit<ProfileModel, "id" | "created_at"> = {
+      user_id: userId,
+      profile_name: formData.profile_name.trim(),
+      name: formData.name.trim(),
+      email: formData.email.trim(),
+      phone: formData.phone?.trim() || null,
+      address: formData.address?.trim() || null,
+      // Get values from formData, trim, and set to null if empty
+      education: formData.education?.trim() || null,
+      experience: formData.experience?.trim() || null,
+      skills: formData.skills?.trim() || null,
+      certifications: formData.certifications?.trim() || null,
+      projects: formData.projects?.trim() || null,
+      languages: formData.languages?.trim() || null,
+      hobbies: formData.hobbies?.trim() || null,
+    };
+
+    try {
+      const newProfile = await createProfile(profilePayload);
+      setProfiles((prev) => [newProfile, ...prev]);
+      setShowAddForm(false);
+      // *** STEP 6: Update Form Reset ***
+      setFormData(initialFormData); // Reset form to initial empty state
+    } catch (err) {
+      setFormError(
+        err instanceof Error ? err.message : "Failed to create profile."
+      );
+      console.error(err);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  // Helper function for common input/textarea classes
+  const getInputClasses = (isTextarea: boolean = false): string => {
+    return `block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-primary-dark focus:border-primary-dark sm:text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 ${
+      isTextarea ? "min-h-[80px]" : ""
+    }`; // Add min-height for textareas
+  };
+
+  // --- Render Logic ---
+  return (
+    <div className="p-4 md:p-6">
+      {/* Header and Add Button */}
+      <div className="flex flex-wrap justify-between items-center mb-6 gap-4">
+        <h1 className="text-2xl font-semibold text-gray-900 dark:text-white">
+          Your Profiles
+        </h1>
+        <button
+          onClick={() => setShowAddForm(!showAddForm)}
+          disabled={!userId}
+          title={
+            !userId
+              ? "Login required"
+              : showAddForm
+              ? "Cancel Adding Profile"
+              : "Add New Profile"
+          }
+          className={`inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-dark ${
+            !userId
+              ? "bg-gray-400 cursor-not-allowed"
+              : showAddForm
+              ? "bg-red-600 hover:bg-red-700"
+              : "bg-primary hover:bg-primary-dark"
+          }`}
+        >
+          {showAddForm ? (
+            <>
+              <PlusCircleIcon className="w-5 h-5 mr-2 transform rotate-45" />
+              Cancel
+            </>
+          ) : (
+            <>
+              <PlusCircleIcon className="w-5 h-5 mr-2" />
+              Add New Profile
+            </>
+          )}
+        </button>
+      </div>
+
+      {/* Add Profile Form - Render conditionally */}
+      {showAddForm && (
+        <div className="mb-8 p-6 bg-white dark:bg-gray-800 rounded-lg shadow-md border dark:border-gray-700">
+          <h2 className="text-xl font-semibold mb-4 text-gray-800 dark:text-white border-b dark:border-gray-600 pb-2">
+            Create New Profile
+          </h2>
+          {formError && (
+            <div className="mb-4 p-3 text-red-700 dark:text-red-300 bg-red-100 dark:bg-red-900 border border-red-300 dark:border-red-600 rounded-md text-sm">
+              {formError}
+            </div>
+          )}
+          <form onSubmit={handleAddProfileSubmit} className="space-y-6">
+            {" "}
+            {/* Increased space */}
+            {/* --- Basic Info Section --- */}
+            <fieldset className="border dark:border-gray-600 p-4 rounded-md">
+              <legend className="text-base font-medium text-gray-900 dark:text-white px-2">
+                Basic Information
+              </legend>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-2">
+                <div>
+                  <label
+                    htmlFor="profile_name"
+                    className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+                  >
+                    Profile Nickname *
+                  </label>
+                  <input
+                    type="text"
+                    id="profile_name"
+                    name="profile_name"
+                    required
+                    value={formData.profile_name}
+                    onChange={handleInputChange}
+                    className={getInputClasses()}
+                    placeholder="e.g., Main Profile, SDE Role"
+                  />
+                </div>
+                <div>
+                  <label
+                    htmlFor="name"
+                    className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+                  >
+                    Your Full Name *
+                  </label>
+                  <input
+                    type="text"
+                    id="name"
+                    name="name"
+                    required
+                    value={formData.name}
+                    onChange={handleInputChange}
+                    className={getInputClasses()}
+                    placeholder="John Doe"
+                  />
+                </div>
+                <div>
+                  <label
+                    htmlFor="email"
+                    className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+                  >
+                    Email *
+                  </label>
+                  <input
+                    type="email"
+                    id="email"
+                    name="email"
+                    required
+                    value={formData.email}
+                    onChange={handleInputChange}
+                    className={getInputClasses()}
+                    placeholder="you@example.com"
+                  />
+                </div>
+                <div>
+                  <label
+                    htmlFor="phone"
+                    className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+                  >
+                    Phone
+                  </label>
+                  <input
+                    type="tel"
+                    id="phone"
+                    name="phone"
+                    value={formData.phone}
+                    onChange={handleInputChange}
+                    className={getInputClasses()}
+                    placeholder="Optional"
+                  />
+                </div>
+                <div className="md:col-span-2">
+                  <label
+                    htmlFor="address"
+                    className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+                  >
+                    Address
+                  </label>
+                  <input
+                    type="text"
+                    id="address"
+                    name="address"
+                    value={formData.address}
+                    onChange={handleInputChange}
+                    className={getInputClasses()}
+                    placeholder="Optional: City, State, Country"
+                  />
+                </div>
+              </div>
+            </fieldset>
+            {/* --- Professional Details Section --- */}
+            <fieldset className="border dark:border-gray-600 p-4 rounded-md">
+              <legend className="text-base font-medium text-gray-900 dark:text-white px-2">
+                Professional Details
+              </legend>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-2">
+                {" "}
+                {/* Increased gap */}
+                {/* *** STEP 3: Add Form Inputs *** */}
+                <div className="md:col-span-2">
+                  <label
+                    htmlFor="education"
+                    className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+                  >
+                    Education
+                  </label>
+                  <textarea
+                    id="education"
+                    name="education"
+                    value={formData.education}
+                    onChange={handleInputChange}
+                    className={getInputClasses(true)} // Indicate textarea
+                    placeholder="Optional: List degrees, schools, dates (e.g., B.S. Computer Science, XYZ University, 2020)"
+                    rows={3} // Suggest initial rows
+                  />
+                </div>
+                <div className="md:col-span-2">
+                  <label
+                    htmlFor="experience"
+                    className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+                  >
+                    Work Experience
+                  </label>
+                  <textarea
+                    id="experience"
+                    name="experience"
+                    value={formData.experience}
+                    onChange={handleInputChange}
+                    className={getInputClasses(true)}
+                    placeholder="Optional: List job titles, companies, dates, responsibilities/achievements"
+                    rows={5}
+                  />
+                </div>
+                <div className="md:col-span-2">
+                  <label
+                    htmlFor="skills"
+                    className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+                  >
+                    Skills
+                  </label>
+                  <textarea
+                    id="skills"
+                    name="skills"
+                    value={formData.skills}
+                    onChange={handleInputChange}
+                    className={getInputClasses(true)}
+                    placeholder="Optional: Comma-separated list (e.g., Python, React, AWS, Project Management)"
+                    rows={3}
+                  />
+                </div>
+                <div>
+                  <label
+                    htmlFor="certifications"
+                    className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+                  >
+                    Certifications
+                  </label>
+                  <textarea // Changed to textarea for potentially longer lists
+                    id="certifications"
+                    name="certifications"
+                    value={formData.certifications}
+                    onChange={handleInputChange}
+                    className={getInputClasses(true)}
+                    placeholder="Optional: List certifications (e.g., AWS Certified Developer, PMP)"
+                    rows={2}
+                  />
+                </div>
+                <div>
+                  <label
+                    htmlFor="languages"
+                    className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+                  >
+                    Languages Spoken
+                  </label>
+                  <input
+                    type="text"
+                    id="languages"
+                    name="languages"
+                    value={formData.languages}
+                    onChange={handleInputChange}
+                    className={getInputClasses()}
+                    placeholder="Optional: e.g., English (Native), Spanish (Fluent)"
+                  />
+                </div>
+                <div className="md:col-span-2">
+                  <label
+                    htmlFor="projects"
+                    className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+                  >
+                    Projects
+                  </label>
+                  <textarea
+                    id="projects"
+                    name="projects"
+                    value={formData.projects}
+                    onChange={handleInputChange}
+                    className={getInputClasses(true)}
+                    placeholder="Optional: Describe personal or professional projects, links if available"
+                    rows={4}
+                  />
+                </div>
+                <div className="md:col-span-2">
+                  <label
+                    htmlFor="hobbies"
+                    className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+                  >
+                    Hobbies & Interests
+                  </label>
+                  <input
+                    type="text"
+                    id="hobbies"
+                    name="hobbies"
+                    value={formData.hobbies}
+                    onChange={handleInputChange}
+                    className={getInputClasses()}
+                    placeholder="Optional: e.g., Hiking, Photography, Open Source Contribution"
+                  />
+                </div>
+              </div>
+            </fieldset>
+            {/* Form Actions */}
+            <div className="flex justify-end pt-6 border-t dark:border-gray-600 space-x-3">
+              <button
+                type="button"
+                onClick={() => {
+                  setShowAddForm(false);
+                  setFormData(initialFormData); // Also reset form on explicit cancel
+                  setFormError(""); // Clear form error on cancel
+                }}
+                className="px-4 py-2 border border-gray-300 dark:border-gray-500 rounded-md shadow-sm text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
+              >
+                Cancel
+              </button>
+              <button
+                type="submit"
+                disabled={isSubmitting}
+                className={`inline-flex justify-center items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-primary hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-dark ${
+                  isSubmitting ? "opacity-50 cursor-not-allowed" : ""
+                }`}
+              >
+                {isSubmitting ? (
+                  <LoadingSpinner size="small" color="white" className="mr-2" />
+                ) : null}
+                {isSubmitting ? "Saving Profile..." : "Save Profile"}
+              </button>
+            </div>
+          </form>
+        </div>
+      )}
+
+      {/* Loading State */}
+      {loading && (
+        <div className="flex justify-center items-center h-40">
+          <LoadingSpinner  />
+        </div>
+      )}
+
+      {/* Error Display */}
+      {!loading && error && (
+        <div className="my-4 text-red-700 dark:text-red-300 p-4 bg-red-100 dark:bg-red-900/50 rounded border border-red-300 dark:border-red-600">
+          <p className="font-medium">Error loading profiles:</p>
+          <p>{error}</p>
+          <button
+            onClick={loadProfiles}
+            className="mt-2 text-sm font-medium text-primary hover:underline"
+          >
+            Try Again
+          </button>
+        </div>
+      )}
+
+      {/* Content Display (Existing Profiles List - no changes needed here) */}
+      {!loading && !error && (
+        <>
+          {/* Empty State Message */}
+          {profiles.length === 0 && !showAddForm && (
+            <div className="text-center py-10 px-6 bg-gray-50 dark:bg-gray-800 rounded-lg border border-dashed border-gray-300 dark:border-gray-600">
+              <IdentificationIcon className="mx-auto h-12 w-12 text-gray-400" />
+              <h3 className="mt-2 text-sm font-medium text-gray-900 dark:text-white">
+                No profiles created yet
+              </h3>
+              <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+                Get started by creating your first profile using the button
+                above.
+              </p>
+              {/* Optional: Add the button here too if you prefer */}
+            </div>
+          )}
+
+          {/* List Existing Profiles */}
+          {profiles.length > 0 && (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {profiles.map((profile) => (
+                <div
+                  key={profile.id}
+                  className="bg-white dark:bg-gray-800 rounded-lg shadow overflow-hidden border border-gray-200 dark:border-gray-700 flex flex-col"
+                >
+                  <div className="p-5 flex-grow">
+                    <div className="flex items-center mb-3">
+                      <UserCircleIcon className="w-6 h-6 mr-2 text-primary dark:text-primary-light flex-shrink-0" />
+                      <h3
+                        className="text-lg font-semibold text-gray-900 dark:text-white truncate"
+                        title={profile.profile_name}
+                      >
+                        {profile.profile_name}
+                      </h3>
+                    </div>
+                    <div className="space-y-2 text-sm text-gray-700 dark:text-gray-300">
+                      {/* Basic Info */}
+                      <p>
+                        <strong className="font-medium text-gray-800 dark:text-gray-200">
+                          Name:
+                        </strong>{" "}
+                        {profile.name}
+                      </p>
+                      <p>
+                        <strong className="font-medium text-gray-800 dark:text-gray-200">
+                          Email:
+                        </strong>{" "}
+                        {profile.email}
+                      </p>
+                      {profile.phone && (
+                        <p>
+                          <strong className="font-medium text-gray-800 dark:text-gray-200">
+                            Phone:
+                          </strong>{" "}
+                          {profile.phone}
+                        </p>
+                      )}
+                      {profile.address && (
+                        <p>
+                          <strong className="font-medium text-gray-800 dark:text-gray-200">
+                            Address:
+                          </strong>{" "}
+                          {profile.address}
+                        </p>
+                      )}
+
+                      {/* Detailed Info - Conditionally render if data exists */}
+                      {profile.education && (
+                        <p>
+                          <strong className="font-medium text-gray-800 dark:text-gray-200">
+                            Education:
+                          </strong>{" "}
+                          <span className="whitespace-pre-wrap">
+                            {profile.education}
+                          </span>
+                        </p>
+                      )}
+                      {profile.experience && (
+                        <p>
+                          <strong className="font-medium text-gray-800 dark:text-gray-200">
+                            Experience:
+                          </strong>{" "}
+                          <span className="whitespace-pre-wrap">
+                            {profile.experience}
+                          </span>
+                        </p>
+                      )}
+                      {profile.skills && (
+                        <p>
+                          <strong className="font-medium text-gray-800 dark:text-gray-200">
+                            Skills:
+                          </strong>{" "}
+                          <span className="whitespace-pre-wrap">
+                            {profile.skills}
+                          </span>
+                        </p>
+                      )}
+                      {profile.certifications && (
+                        <p>
+                          <strong className="font-medium text-gray-800 dark:text-gray-200">
+                            Certifications:
+                          </strong>{" "}
+                          <span className="whitespace-pre-wrap">
+                            {profile.certifications}
+                          </span>
+                        </p>
+                      )}
+                      {profile.projects && (
+                        <p>
+                          <strong className="font-medium text-gray-800 dark:text-gray-200">
+                            Projects:
+                          </strong>{" "}
+                          <span className="whitespace-pre-wrap">
+                            {profile.projects}
+                          </span>
+                        </p>
+                      )}
+                      {profile.languages && (
+                        <p>
+                          <strong className="font-medium text-gray-800 dark:text-gray-200">
+                            Languages:
+                          </strong>{" "}
+                          <span className="whitespace-pre-wrap">
+                            {profile.languages}
+                          </span>
+                        </p>
+                      )}
+                      {profile.hobbies && (
+                        <p>
+                          <strong className="font-medium text-gray-800 dark:text-gray-200">
+                            Hobbies:
+                          </strong>{" "}
+                          <span className="whitespace-pre-wrap">
+                            {profile.hobbies}
+                          </span>
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                  <div className="border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50 px-5 py-3">
+                    <p className="text-xs text-gray-500 dark:text-gray-400">
+                      ID: {profile.id} | Created:{" "}
+                      {new Date(profile.created_at).toLocaleString()}{" "}
+                      {/* Use toLocaleString for date+time */}
+                    </p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </>
+      )}
+    </div>
+  );
+};
+
+export default ProfileManager;

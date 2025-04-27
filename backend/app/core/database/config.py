@@ -131,6 +131,51 @@ class UserRepository(BaseRepository):
                 "id": user[0], "name": user[1], "email": user[2], "phone": user[4], "created_at": user[5]
             }
         return None
+    
+
+    def update(self, user_id: int, update_data: dict):
+
+        logger.debug(f"Attempting to update user ID: {user_id} with data: {list(update_data.keys())}")
+
+        if not update_data:
+            logger.warning(f"No update data provided for user ID: {user_id}")
+            return {"status": "success", "message": "No changes provided."} # Or error? Maybe success is better.
+
+        if 'password' in update_data and update_data['password']:
+            try:
+                hashed_password = bcrypt.hashpw(update_data['password'].encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
+                update_data['password'] = hashed_password
+                logger.debug(f"Password hashed for user ID: {user_id}")
+            except Exception as e:
+                logger.error(f"Password hashing failed for user ID: {user_id}: {str(e)}")
+                return {"status": "error", "message": "Password hashing failed"}
+        elif 'password' in update_data:
+            del update_data['password']
+            if not update_data:
+                 logger.warning(f"Password was blank, no other changes provided for user ID: {user_id}")
+                 return {"status": "success", "message": "No effective changes provided."}
+
+
+        set_clause = ", ".join([f"{key} = ?" for key in update_data.keys()])
+        query = f"UPDATE user SET {set_clause} WHERE id = ?"
+        params = list(update_data.values()) + [user_id]
+
+        try:
+            with get_db_connection() as conn:
+                cursor = conn.cursor()
+                cursor.execute(query, tuple(params))
+                conn.commit()
+                if cursor.rowcount == 0:
+                    logger.warning(f"Update attempt for non-existent user ID: {user_id}")
+                    return {"status": "error", "message": "User not found or no changes made"}
+                logger.info(f"User ID: {user_id} updated successfully. Fields: {list(update_data.keys())}")
+                return {"status": "success", "message": "User updated successfully"}
+        except sqlite3.Error as e:
+            logger.error(f"Database error updating user ID: {user_id} - {str(e)}")
+            return {"status": "error", "message": f"Database error: {str(e)}"}
+        except Exception as e:
+            logger.error(f"Unexpected error updating user ID: {user_id} - {str(e)}")
+            return {"status": "error", "message": "An unexpected error occurred"}
 
 class ProfileRepository(BaseRepository):
     def __init__(self):

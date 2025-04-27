@@ -20,6 +20,10 @@ class User(BaseModel):
     phone: Optional[str] = None
     created_at: datetime
 
+class UpdateUserSettingsModel(BaseModel):
+    phone: Optional[str] = None 
+    password: Optional[str] = None 
+
 class profileModel(BaseModel):
     profile_name: str
     user_id: int
