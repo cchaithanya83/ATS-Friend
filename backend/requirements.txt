@@ -49,8 +49,6 @@ pyinstaller-hooks-contrib==2025.2
 pytest==8.3.5
 pytest-asyncio==0.26.0
 python-dateutil==2.9.0.post0
-pywin32==308
-pywin32-ctypes==0.2.3
 PyYAML==6.0.2
 pyzmq==26.2.1
 reportlab==4.3.1
