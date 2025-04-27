@@ -7,14 +7,7 @@ import {
   ArrowLeftOnRectangleIcon,
 } from "@heroicons/react/24/solid";
 
-// Define UserData type (or import if defined elsewhere)
-interface UserData {
-  id: number;
-  name: string;
-  email: string;
-  phone: string;
-  created_at: string;
-}
+
 
 // Helper function to check authentication (can also be moved to a utils file)
 const isAuthenticated = (): boolean => {

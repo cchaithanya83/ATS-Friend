@@ -86,7 +86,7 @@ const GenerateResume: React.FC = () => {
     try {
       const generatedResume = await generateNewResume(userId, payload);
       // Navigate to the view page of the newly generated resume
-      const newResumeId = generatedResume.id ?? generatedResume.resume_id;
+      const newResumeId = generatedResume.resume_id;
       if (newResumeId) {
         navigate(`/dashboard/resumes/${newResumeId}`);
       } else {

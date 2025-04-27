@@ -1,6 +1,6 @@
 // src/pages/dashboard/ResumeView.tsx
 import React, { useState, useEffect, useRef } from "react";
-import { useParams, Link, useNavigate } from "react-router-dom";
+import { useParams, Link } from "react-router-dom";
 import {
   fetchSingleResume, // To get metadata like name/title
   fetchResumePdfBlob, // To get the PDF data as Blob
@@ -17,7 +17,6 @@ import {
 
 const ResumeView: React.FC = () => {
   const { resumeId } = useParams<{ resumeId: string }>();
-  const navigate = useNavigate();
 
   // State for metadata
   const [resumeInfo, setResumeInfo] = useState<GeneratedResume | null>(null);
@@ -145,8 +144,6 @@ const ResumeView: React.FC = () => {
     }
   };
 
-  // --- Combined Loading State ---
-  const isLoading = loadingInfo || loadingPdf;
 
   // --- Render Logic ---
   return (
@@ -228,7 +225,7 @@ const ResumeView: React.FC = () => {
         {loadingPdf && (
           // Make loader fill the container
           <div className="w-full h-full flex justify-center items-center">
-            <LoadingSpinner text="Loading PDF Preview..." />
+            <LoadingSpinner />
           </div>
         )}
         {!loadingPdf && pdfError && (

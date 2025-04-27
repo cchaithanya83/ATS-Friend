@@ -86,17 +86,11 @@ export const fetchProfiles = async (
       return [];
     }
 
-    if (isApiError(error) && error.response?.data?.detail) {
-      const errorDetail = Array.isArray(
-        (error.response.data as HttpValidationError).detail
-      )
-        ? (error.response.data as HttpValidationError).detail
-            .map((err) => err.msg)
-            .join(", ")
-        : typeof error.response.data.detail === "string"
-        ? error.response.data.detail
-        : "API error occurred";
-      throw new Error(errorDetail);
+    if (
+      isApiError(error) &&
+      (error.response?.data as HttpValidationError)?.detail
+    ) {
+      throw new Error("Error fetching profiles: ");
     }
     if (error instanceof Error) {
       throw new Error(
@@ -253,12 +247,11 @@ export const fetchGeneratedResumes = async (
       return [];
     }
 
-    if (isApiError(error) && error.response?.data?.detail) {
-      const errorDetail =
-        typeof error.response.data.detail === "string"
-          ? error.response.data.detail
-          : "Failed to fetch resumes";
-      throw new Error(errorDetail);
+    if (
+      isApiError(error) &&
+      (error.response?.data as HttpValidationError)?.detail
+    ) {
+      throw new Error("Failed to fetch resume");
     }
     if (error instanceof Error) {
       throw new Error(
@@ -319,12 +312,8 @@ export const fetchSingleResume = async (
       throw new Error("Resume not found.");
     }
     // Extract detail message if available
-    if (isApiError(error) && error.response?.data?.detail) {
-      const errorDetail =
-        typeof error.response.data.detail === "string"
-          ? error.response.data.detail
-          : "Failed to fetch resume details";
-      throw new Error(errorDetail);
+    if (isApiError(error) && error.response?.data) {
+      throw new Error("Error fetching resume details ");
     }
     if (error instanceof Error) {
       throw error;
@@ -353,7 +342,9 @@ export const fetchSingleResume = async (
 export const generateNewResume = async (
   userId: number,
   payload: NewResumePayload
-): Promise<{ resume_id: number }> => {
+): Promise<{
+  resume_id: number;
+}> => {
   // Return an object containing just the ID
   console.warn(
     "generateNewResume: API POSTs data. Expecting { data: { resume_id: number, message: string } } in response."
@@ -406,15 +397,9 @@ export const generateNewResume = async (
     if (isApiError(error)) {
       // Check if it's an Axios error first
       if (error.response?.status === 422) {
-        const errorDetail = error.response?.data?.detail;
-        const message = Array.isArray(errorDetail)
-          ? errorDetail
-              .map((err) => `${err.loc?.[1] || "Field"}: ${err.msg}`)
-              .join("; ")
-          : typeof errorDetail === "string"
-          ? errorDetail
-          : "Validation Failed: Please check resume details and JD.";
-        throw new Error(message);
+        throw new Error(
+          "Validation Failed: Please check resume details and JD."
+        );
       }
       // Throw other Axios error details if possible
       const responseMessage =
@@ -593,23 +578,15 @@ export const updateUserSettings = async (
 
     // Keep the existing validation error handling (good for FastAPI's 422 responses)
     if (isApiError(error) && error.response?.status === 422) {
-      const errorDetail = error.response?.data?.detail;
-      const message = Array.isArray(errorDetail)
-        ? errorDetail
-            .map((err) => `${err.loc?.[1] || "Field"}: ${err.msg}`) // Extracts field name and message
-            .join("; ")
-        : typeof errorDetail === "string"
-        ? errorDetail
-        : "Validation Failed: Please check your input."; // Fallback validation message
-      throw new Error(message);
+      throw new Error("Error updating settings ");
     }
 
     // Re-throw other errors (network issues, 500 errors, etc.)
     // Or handle them more specifically if needed
     // You might want to extract a generic error message from the caught error
-    if (isApiError(error) && error.response?.data?.detail) {
+    if (isApiError(error) && error.response) {
       // Use detail message from FastAPI for non-422 errors if available
-      throw new Error(error.response.data.detail);
+      throw new Error("An unknown error occurred.");
     } else if (error instanceof Error) {
       // Use the error message property
       throw new Error(

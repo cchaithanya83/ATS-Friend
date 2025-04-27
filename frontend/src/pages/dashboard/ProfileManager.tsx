@@ -6,13 +6,6 @@ import LoadingSpinner from "../../components/common/LoadingSpinner"; // Adjust p
 import {
   PlusCircleIcon,
   UserCircleIcon,
-  MapPinIcon,
-  AcademicCapIcon,
-  BriefcaseIcon,
-  WrenchScrewdriverIcon,
-  BookOpenIcon,
-  LanguageIcon,
-  HeartIcon,
   IdentificationIcon,
 } from "@heroicons/react/24/outline";
 
@@ -466,7 +459,7 @@ const ProfileManager: React.FC = () => {
       {/* Loading State */}
       {loading && (
         <div className="flex justify-center items-center h-40">
-          <LoadingSpinner  />
+          <LoadingSpinner />
         </div>
       )}
 
