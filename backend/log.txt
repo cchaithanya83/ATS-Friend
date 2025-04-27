@@ -689,3 +689,27 @@
 2025-04-27 18:15:23,976 - app.core.logs - INFO - Resume 1 retrieved for user 1
 2025-04-27 18:15:26,274 - app.core.logs - INFO - PDF generated successfully for resume_1_1
 2025-04-27 18:15:26,277 - app.core.logs - INFO - PDF generated for resume 1 of user 1
+2025-04-27 18:15:47,961 - app.core.logs - INFO - Resume 1 retrieved for user 1
+2025-04-27 18:15:50,952 - app.core.logs - INFO - PDF generated successfully for resume_1_1
+2025-04-27 18:15:50,958 - app.core.logs - INFO - PDF generated for resume 1 of user 1
+2025-04-27 18:15:50,962 - app.core.logs - INFO - Resume 1 retrieved for user 1
+2025-04-27 18:15:52,477 - app.core.logs - INFO - PDF generated successfully for resume_1_1
+2025-04-27 18:15:52,479 - app.core.logs - INFO - PDF generated for resume 1 of user 1
+2025-04-27 18:15:52,482 - app.core.logs - INFO - Resume 1 retrieved for user 1
+2025-04-27 18:15:52,493 - app.core.logs - INFO - Resume 1 retrieved for user 1
+2025-04-27 18:15:54,035 - app.core.logs - INFO - PDF generated successfully for resume_1_1
+2025-04-27 18:15:54,038 - app.core.logs - INFO - PDF generated for resume 1 of user 1
+2025-04-27 18:15:55,695 - app.core.logs - INFO - PDF generated successfully for resume_1_1
+2025-04-27 18:15:55,698 - app.core.logs - INFO - PDF generated for resume 1 of user 1
+2025-04-27 18:15:59,890 - app.core.logs - INFO - Profiles retrieved for user 1
+2025-04-27 18:15:59,899 - app.core.logs - INFO - Profiles retrieved for user 1
+2025-04-27 19:14:12,305 - app.core.logs - INFO - Resume 1 retrieved for user 1
+2025-04-27 19:14:14,833 - app.core.logs - INFO - PDF generated successfully for resume_1_1
+2025-04-27 19:14:14,836 - app.core.logs - INFO - PDF generated for resume 1 of user 1
+2025-04-27 19:14:14,848 - app.core.logs - INFO - Resume 1 retrieved for user 1
+2025-04-27 19:14:14,852 - app.core.logs - INFO - Resume 1 retrieved for user 1
+2025-04-27 19:14:16,793 - app.core.logs - INFO - PDF generated successfully for resume_1_1
+2025-04-27 19:14:16,796 - app.core.logs - INFO - PDF generated for resume 1 of user 1
+2025-04-27 19:14:16,804 - app.core.logs - INFO - Resume 1 retrieved for user 1
+2025-04-27 19:14:18,244 - app.core.logs - INFO - PDF generated successfully for resume_1_1
+2025-04-27 19:14:18,245 - app.core.logs - INFO - PDF generated for resume 1 of user 1
