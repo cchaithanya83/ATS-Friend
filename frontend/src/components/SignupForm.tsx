@@ -72,6 +72,7 @@ const SignupForm: React.FC<SignupFormProps> = ({ switchToLogin }) => {
       email: email.trim(),
       password,
       phone: phone.trim() || null,
+      created_at: new Date().toISOString(), // Optional: Set to current time
     }; // Backend handles created_at
 
     try {
