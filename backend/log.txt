@@ -713,3 +713,7 @@
 2025-04-27 19:14:16,804 - app.core.logs - INFO - Resume 1 retrieved for user 1
 2025-04-27 19:14:18,244 - app.core.logs - INFO - PDF generated successfully for resume_1_1
 2025-04-27 19:14:18,245 - app.core.logs - INFO - PDF generated for resume 1 of user 1
+2025-04-29 13:59:05,324 - app.core.logs - INFO - Starting the FastAPI application
+2025-04-29 13:59:33,754 - app.core.logs - INFO - Signup attempt for email: string
+2025-04-29 13:59:34,038 - app.core.database.config - INFO - Successful signup for email: string
+2025-04-29 13:59:34,038 - app.core.logs - INFO - User string signed up successfully

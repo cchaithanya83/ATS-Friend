@@ -138,6 +138,8 @@ async def new_profile(profile: profileModel, user_repo: UserRepository = Depends
     logger.error(f"Failed to create profile for user {profile.user_id}: {result['message']}")
     raise HTTPException(status_code=400, detail="Profile creation failed")
 
+
+
 @api_routes.get("/profile/{user_id}", response_model=ApiResponse)
 async def get_profile_by_userid(user_id: int, profile_repo: ProfileRepository = Depends(get_profile_repo)):
     profiles = profile_repo.get_by_user_id(user_id)

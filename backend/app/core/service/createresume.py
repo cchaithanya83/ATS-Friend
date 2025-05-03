@@ -9,78 +9,56 @@ from app.core.logs import logger
 
 
 async def create_resume(resume_data: dict, job_title: str, job_description: str) -> str:
-    """Generates a resume in LaTeX format tailored to a specific job with a blue and black color scheme.
-
-    Args:
-        resume_data (dict): A dictionary with resume details in the following structure:
-            {
-                'personal': {'name': str, 'email': str, 'phone': str, 'address': str},
-                'education': [{'degree': str, 'institution': str, 'years': str, 'details': str}],
-                'experience': [{'title': str, 'company': str, 'dates': str, 'responsibilities': list[str]}],
-                'skills': {'technical': list[str], 'soft': list[str]}
-            }
-        job_title (str): The title of the job being applied for.
-        job_description (str): The job description to tailor the resume.
-
-    Returns:
-        str: The generated LaTeX resume code, compilable with pdflatex.
+    """
+    Generates a one-page ATS-friendly LaTeX resume, tailored to a specific job using a blue and black color scheme.
     """
     system_prompt = (
-    "You are a professional resume generator specializing in LaTeX. Generate a resume in LaTeX format using a custom blue and black color scheme. "
-    "The resume must be ATS-friendly, one page, visually appealing, and include sections for personal information, education, work experience, skills, certifications, hobbies, languages, and projects. "
-    "Rules:\n"
-    "1. Return only the LaTeX code without explanations, comments, or additional text.\n"
-    "2. Use only the following standard LaTeX packages: article, geometry, amsmath, amssymb, enumitem, ragged2e, multicol, xcolor, helvet.\n"
-    "3. Avoid non-standard packages (e.g., moderncv) and custom commands (e.g., \\cventry).\n"
-    "4. Structure experience and education entries using standard LaTeX commands (e.g., \\textbf, \\textit, minipage, or parbox) with a consistent format: job title/degree in bold, company/institution in italics, dates on the right, and bullet points for details.\n"
-    "5. Ensure all braces are properly matched and no blank lines appear within entry descriptions.\n"
-    "6. Exclude photos, hyperlinks, and any reference to the job title or description in the resume.\n"
-    "7. Define a blue color (\\definecolor{cvblue}{RGB}{0,102,204}) for headings and accents, and use black for body text.\n"
-    "8. Optimize spacing and typography for a balanced, attractive one-page layout without excessive empty space.\n"
-    "9. Use the Helvetica font by loading \\usepackage{helvet} and setting \\renewcommand{\\familydefault}{\\sfdefault} in the preamble.\n"
-    "10. Ensure the code is complete, compilable with pdflatex, and produces a professional, visually appealing PDF.\n"
-    "11. Use bullet points for responsibilities, achievements, skills, and other lists, formatted with the enumitem package.\n"
-    "12. Prioritize skills, experiences, and keywords that align with the job description, using concise, professional language.\n"
-    "13. For sections with no data (e.g., certifications, languages), omit the section entirely rather than generating an empty \\itemize environment.\n"
-    "14. Ensure no empty \\itemize environments are generated (e.g., \\begin{itemize} \\end{itemize} without \\item commands)."
+        "You are a professional LaTeX resume generator. Your task is to generate a polished, one-page resume in LaTeX format using only standard packages. "
+        "Strictly follow these formatting and tailoring rules:\n"
+        "1. Use only these LaTeX packages: article, geometry, amsmath, amssymb, enumitem, ragged2e, multicol, xcolor, helvet.\n"
+        "2. The resume must fit a single A4 page with compact margins using \\geometry{margin=0.7in} and have a balanced layout with no excessive white space.\n"
+        "3. Set font to Helvetica using \\usepackage{helvet} and \\renewcommand{\\familydefault}{\\sfdefault}.\n"
+        "4. Use \\definecolor{cvblue}{RGB}{0,102,204} for section headings and bullet accents. All body text must be black.\n"
+        "5. Sections: Personal Info, Objective, Education, Work Experience, Skills, Certifications, Projects, Hobbies, Languages.\n"
+        "6. For each section, apply:\n"
+        "   - Section titles in cvblue, bold, with spacing optimized for compactness.\n"
+        "   - Personal Info: Centered name in bold, large font; email, phone, address below.\n"
+        "   - Objective: One concise sentence summarizing experience, goals, and match with the job.\n"
+        "   - Education & Work Experience: Use bold for title/degree, italics for company/institution, right-aligned dates, bullets for details.\n"
+        "   - Skills: Bullet-pointed technical and soft skills, grouped and matched to the job.\n"
+        "   - Projects: Bold titles, right-aligned date, bullets for impact and relevance.\n"
+        "   - Only include non-empty sections; do not generate empty environments (e.g., \\begin{itemize} \\end{itemize}).\n"
+        "7. Tailoring:\n"
+        "   - Prioritize and emphasize content most relevant to the job description.\n"
+        "   - You may reorder sections to highlight alignment with the job.\n"
+        "   - Compress, merge, or drop less relevant experiences if space is tight.\n"
+        "   - Match technical terms, skills, and achievements to the job description using clear, concise language.\n"
+        "   - Do NOT include the job title or description text in the output.\n"
+        "8. Final output must be complete, compilable with pdflatex, and free of errors, comments, or explanations.\n"
     )
 
     user_prompt = (
-        "Generate a LaTeX resume based on the following details:\n"
+        f"Generate a LaTeX resume tailored to this job:\n"
         f"Job Title: {job_title}\n"
         f"Job Description: {job_description}\n"
-        "Resume Details:\n"
-        f"{resume_data}\n"
-        "Structure the resume with:\n"
-        "- Personal Information: Name (centered, large, bold), email, phone, address (from resume_data['personal']) in a multi line below the name.\n"
-        "- objective: A brief summary of the candidate's career goals and skills (from resume_data['objective']). And match the objective with the job title and description.\n"
-        "- Education: Degrees (bold), institutions (italics), years (right-aligned), and relevant details as bullet points (from resume_data['education']). Include only if resume_data['education'] is non-empty.\n"
-        "- Work Experience: Job titles (bold), companies (italics), dates (right-aligned), and responsibilities/achievements as bullet points (from resume_data['experience']). Include only if resume_data['experience'] is non-empty.\n"
-        "- Skills: Technical and soft skills as a bullet-point list (from resume_data['skills']). Include only if resume_data['skills'] is non-empty.\n"
-        "- Certifications: List of certifications as bullet points (from resume_data['certifications']). Include only if resume_data['certifications'] is non-empty.\n"
-        "- Projects: List of projects with title (bold), date (right-aligned), and description as bullet points (from resume_data['projects']). Include only if resume_data['projects'] is non-empty.\n"
-        "- Hobbies: List of hobbies as bullet points (from resume_data['hobbies']). Include only if resume_data['hobbies'] is non-empty.\n"
-        "- Languages: List of languages spoken as bullet points (from resume_data['languages']). Include only if resume_data['languages'] is non-empty.\n"
-
-        "Tailoring Instructions:\n"
-        "- Highlight skills and experiences relevant to the job title and description.\n"
-        "- Prioritize the most relevant education and work experience.\n"
-        "- Use a consistent format: bold section titles, bold job titles/degrees/project titles, italicized company names/institutions, right-aligned dates.\n"
-        "- Use the defined blue color (cvblue) for section titles and accents (e.g., bullet points or separators).\n"
-        "- Ensure ATS-friendly formatting: avoid tables, special characters, or complex LaTeX constructs.\n"
-        "- Optimize for one page with balanced spacing and elegant typography.\n"
-        "- Exclude the job title and description from the resume content.\n"
-        "- Ensure the code is concise, compilable with pdflatex, and produces a clean, visually appealing PDF.\n"
-        "- Stricly the resume should be single page. Alter the context if it is too long or too short. \n"
-
-        "- Omit any section if its corresponding resume_data field is empty or contains no items, and do not generate empty \\itemize environments."
+        "Resume Data:\n"
+        f"{resume_data}\n\n"
+        "Format the resume as follows:\n"
+        "- Personal Information (centered name in large bold, followed by email, phone, address).\n"
+        "- links: GitHub, LinkedIn, and personal website (if available).\n"
+        "- Objective: One-line statement aligned with the job title and description.\n"
+        "- Education: Degree (bold), Institution (italic), Dates (right-aligned), bullet points for details.\n"
+        "- Work Experience: Title (bold), Company (italic), Dates (right-aligned), bullets for responsibilities.\n"
+        "- Skills: Separate technical and soft skills as bullet points.\n"
+        "- Projects: Title (bold), Dates (right-aligned), bullets for impact and relevance.\n"
+        "- Certifications, Projects, Hobbies, Languages: Include only if available; use bullets and concise formatting.\n\n"
+        "Tailor the resume content to emphasize relevance to the job. Reorder or condense sections to maintain a clean, compact A4 single-page layout. "
+        "Match keywords, technologies, and impact statements to the job description wherever appropriate. Maintain ATS-friendliness by avoiding tables, images, hyperlinks, or non-standard constructs. "
+        "Ensure output is concise, professional, and visually balanced."
     )
-    
+
     generated_resume = await text_gen(system_prompt, user_prompt)
-    
     return generated_resume
-
-
 
 async def convert_latex_to_pdf(latex_code: str, output_filename: str = "resume") -> StreamingResponse:
     """Converts LaTeX code to a PDF and returns it as a streaming response without saving to disk.

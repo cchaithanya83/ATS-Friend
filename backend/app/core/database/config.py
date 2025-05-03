@@ -9,8 +9,7 @@ load_dotenv()
 logger = logging.getLogger(__name__)
 
 def get_db_path():
-    # Replace with your SQLiteCloud connection string
-    # Format: sqlitecloud://<host>:<port>/<database>?apikey=<your_api_key>
+
     return os.getenv("SQLLITECLOUD")
 
 @contextmanager
