@@ -1,17 +1,21 @@
-import sqlite3
+import sqlitecloud
 import os
 import bcrypt
 import logging
 from contextlib import contextmanager
+from dotenv import load_dotenv
+load_dotenv()
 
 logger = logging.getLogger(__name__)
 
 def get_db_path():
-    return os.path.join(os.path.dirname(__file__), 'database.db')
+    # Replace with your SQLiteCloud connection string
+    # Format: sqlitecloud://<host>:<port>/<database>?apikey=<your_api_key>
+    return os.getenv("SQLLITECLOUD")
 
 @contextmanager
 def get_db_connection():
-    conn = sqlite3.connect(get_db_path())
+    conn = sqlitecloud.connect(get_db_path())
     try:
         yield conn
     finally:
@@ -61,7 +65,7 @@ TABLE_SCHEMAS = {
             FOREIGN KEY (user_id) REFERENCES user (id) ON DELETE CASCADE,
             FOREIGN KEY (user_resume_id) REFERENCES profile (id) ON DELETE CASCADE
         )
-    """
+    """,
 }
 
 def init_db():
@@ -120,7 +124,7 @@ class UserRepository(BaseRepository):
             )
             logger.info(f"Successful signup for email: {email}")
             return {"status": "success", "user": {"name": name, "email": email}}
-        except sqlite3.IntegrityError:
+        except sqlitecloud.IntegrityError:
             logger.error(f"Signup failed for email: {email} - User already exists")
             return {"status": "error", "message": "User already exists"}
 
@@ -131,15 +135,13 @@ class UserRepository(BaseRepository):
                 "id": user[0], "name": user[1], "email": user[2], "phone": user[4], "created_at": user[5]
             }
         return None
-    
 
     def update(self, user_id: int, update_data: dict):
-
         logger.debug(f"Attempting to update user ID: {user_id} with data: {list(update_data.keys())}")
 
         if not update_data:
             logger.warning(f"No update data provided for user ID: {user_id}")
-            return {"status": "success", "message": "No changes provided."} # Or error? Maybe success is better.
+            return {"status": "success", "message": "No changes provided."}
 
         if 'password' in update_data and update_data['password']:
             try:
@@ -152,9 +154,8 @@ class UserRepository(BaseRepository):
         elif 'password' in update_data:
             del update_data['password']
             if not update_data:
-                 logger.warning(f"Password was blank, no other changes provided for user ID: {user_id}")
-                 return {"status": "success", "message": "No effective changes provided."}
-
+                logger.warning(f"Password was blank, no other changes provided for user ID: {user_id}")
+                return {"status": "success", "message": "No effective changes provided."}
 
         set_clause = ", ".join([f"{key} = ?" for key in update_data.keys()])
         query = f"UPDATE user SET {set_clause} WHERE id = ?"
@@ -170,7 +171,7 @@ class UserRepository(BaseRepository):
                     return {"status": "error", "message": "User not found or no changes made"}
                 logger.info(f"User ID: {user_id} updated successfully. Fields: {list(update_data.keys())}")
                 return {"status": "success", "message": "User updated successfully"}
-        except sqlite3.Error as e:
+        except sqlitecloud.Error as e:
             logger.error(f"Database error updating user ID: {user_id} - {str(e)}")
             return {"status": "error", "message": f"Database error: {str(e)}"}
         except Exception as e:
@@ -198,7 +199,7 @@ class ProfileRepository(BaseRepository):
             )
             logger.info(f"Profile created successfully for user_id: {profile_data['user_id']}")
             return {"status": "success", "message": "Profile created successfully", "profile_id": profile_id}
-        except sqlite3.Error as e:
+        except sqlitecloud.Error as e:
             logger.error(f"Failed to create profile for user_id: {profile_data['user_id']} - {str(e)}")
             return {"status": "error", "message": str(e)}
 
@@ -242,7 +243,7 @@ class ResumeRepository(BaseRepository):
             )
             logger.info(f"Resume created successfully for user_id: {resume_data['user_id']}")
             return {"status": "success", "message": "Resume created successfully", "resume_id": resume_id}
-        except sqlite3.Error as e:
+        except sqlitecloud.Error as e:
             logger.error(f"Failed to create resume for user_id: {resume_data['user_id']} - {str(e)}")
             return {"status": "error", "message": str(e)}
 
