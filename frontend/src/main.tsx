@@ -18,15 +18,14 @@ if (!rootElement) {
   console.log("Mounting React App within BrowserRouter and ThemeProvider...");
 
   ReactDOM.createRoot(rootElement).render(
-    <React.StrictMode>
-      {/* BrowserRouter MUST be the outermost router component */}
+
       <BrowserRouter>
         {/* ThemeProvider can be inside or outside BrowserRouter, inside is fine */}
         <ThemeProvider>
           <App /> {/* App component is rendered here */}
         </ThemeProvider>
       </BrowserRouter>
-    </React.StrictMode>
+
   );
 
   console.log("React App mounting initiated."); // Check if this logs

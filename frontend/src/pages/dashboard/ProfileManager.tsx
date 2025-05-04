@@ -1,6 +1,10 @@
-// src/pages/dashboard/ProfileManager.tsx
 import React, { useState, useEffect, useCallback } from "react";
-import { fetchProfiles, createProfile, getUserId } from "../../services/api";
+import {
+  fetchProfiles,
+  createProfile,
+  getUserId,
+  uploadResumePDF,
+} from "../../services/api";
 import { ProfileModel } from "../../types/api";
 import LoadingSpinner from "../../components/common/LoadingSpinner";
 import {
@@ -13,15 +17,15 @@ interface ProfileFormData {
   profile_name: string;
   name: string;
   email: string;
-  phone?: string | null; // Allow null
+  phone?: string | null;
   address?: string | null;
+  links?: string | null;
   education?: string | null;
   experience?: string | null;
   skills?: string | null;
   certifications?: string | null;
   projects?: string | null;
   languages?: string | null;
-  hobbies?: string | null;
 }
 
 const ProfileManager: React.FC = () => {
@@ -31,6 +35,9 @@ const ProfileManager: React.FC = () => {
   const [showAddForm, setShowAddForm] = useState<boolean>(false);
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [formError, setFormError] = useState<string>("");
+  const [file, setFile] = useState<File | null>(null);
+  const [isUploading, setIsUploading] = useState<boolean>(false);
+  const [uploadError, setUploadError] = useState<string>("");
 
   const initialFormData: ProfileFormData = {
     profile_name: "",
@@ -38,16 +45,15 @@ const ProfileManager: React.FC = () => {
     email: "",
     phone: "",
     address: "",
+    links: "",
     education: "",
     experience: "",
     skills: "",
     certifications: "",
     projects: "",
     languages: "",
-    hobbies: "",
   };
   const [formData, setFormData] = useState<ProfileFormData>(initialFormData);
-
   const userId = getUserId();
 
   const loadProfiles = useCallback(async () => {
@@ -80,6 +86,87 @@ const ProfileManager: React.FC = () => {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const selectedFile = e.target.files?.[0];
+    if (selectedFile) {
+      if (selectedFile.type !== "application/pdf") {
+        setUploadError("Please upload a PDF file.");
+        setFile(null);
+        return;
+      }
+      setFile(selectedFile);
+      setUploadError("");
+    } else {
+      setFile(null);
+    }
+  };
+
+  const handleFileUpload = async () => {
+    if (!file) {
+      setUploadError("Please select a PDF file to upload.");
+      return;
+    }
+    setIsUploading(true);
+    setUploadError("");
+    try {
+      const resumeData = await uploadResumePDF(file);
+      const formattedData: ProfileFormData = {
+        profile_name: "Resume Profile",
+        name: resumeData.name || "",
+        email: resumeData.email || "",
+        phone: resumeData.phone || "",
+        address: resumeData.address || "",
+        links: resumeData.links ? resumeData.links.join(", ") : "",
+        education: resumeData.education
+          ? resumeData.education
+              .map(
+                (edu: any) =>
+                  `${edu.degree}, ${edu.university}, ${edu.year || ""}`
+              )
+              .join("\n")
+          : "",
+        experience: resumeData.experience
+          ? resumeData.experience
+              .map(
+                (exp: any) =>
+                  `${exp.role}, ${exp.company}, ${exp.description}, ${
+                    exp.years || ""
+                  }`
+              )
+              .join("\n")
+          : "",
+        skills: resumeData.skills ? resumeData.skills.join(", ") : "",
+        certifications: resumeData.certifications
+          ? resumeData.certifications
+              .map((cert: any) => `${cert.name}, ${cert.issuer || ""}`)
+              .join("\n")
+          : "",
+        projects: resumeData.projects
+          ? resumeData.projects
+              .map(
+                (proj: any) =>
+                  `${proj.name}: ${proj.description || ""} (${proj.year || ""})`
+              )
+              .join("\n")
+          : "",
+        languages: resumeData.languages ? resumeData.languages.join(", ") : "",
+      };
+
+      setFormData(formattedData);
+      setShowAddForm(true);
+      setFile(null);
+    } catch (err) {
+      setUploadError(
+        err instanceof Error
+          ? err.message
+          : "Failed to upload and parse resume."
+      );
+      console.error(err);
+    } finally {
+      setIsUploading(false);
+    }
+  };
+
   const handleAddProfileSubmit = async (
     e: React.FormEvent<HTMLFormElement>
   ) => {
@@ -100,28 +187,26 @@ const ProfileManager: React.FC = () => {
     setIsSubmitting(true);
     setFormError("");
 
-    // Prepare payload, ensuring empty strings become null for optional fields
     const profilePayload = Object.entries(formData).reduce(
       (acc, [key, value]) => {
         const trimmedValue = typeof value === "string" ? value.trim() : value;
-        // Handle optional fields specifically, required fields are already validated
         if (
           [
             "phone",
             "address",
+            "links",
             "education",
             "experience",
             "skills",
             "certifications",
             "projects",
             "languages",
-            "hobbies",
           ].includes(key)
         ) {
           acc[key as keyof ProfileFormData] =
             trimmedValue === "" ? null : trimmedValue;
         } else {
-          acc[key as keyof ProfileFormData] = trimmedValue; // Keep required fields as they are (trimmed)
+          acc[key as keyof ProfileFormData] = trimmedValue;
         }
         return acc;
       },
@@ -138,6 +223,7 @@ const ProfileManager: React.FC = () => {
       setProfiles((prev) => [newProfile, ...prev]);
       setShowAddForm(false);
       setFormData(initialFormData);
+      setFile(null);
     } catch (err) {
       setFormError(
         err instanceof Error ? err.message : "Failed to create profile."
@@ -159,8 +245,6 @@ const ProfileManager: React.FC = () => {
 
   return (
     <div>
-      {" "}
-      {/* Removed outer padding, handled by DashboardLayout */}
       <div className="flex flex-wrap justify-between items-center mb-6 gap-4">
         <h1 className="text-2xl sm:text-3xl font-semibold text-gray-900 dark:text-white">
           Your Profiles
@@ -196,6 +280,42 @@ const ProfileManager: React.FC = () => {
           )}
         </button>
       </div>
+
+      <div className="mb-6 p-4 bg-white dark:bg-gray-800 rounded-lg shadow-md border dark:border-gray-700">
+        <h2 className="text-lg sm:text-xl font-semibold mb-4 text-gray-800 dark:text-white border-b dark:border-gray-600 pb-2">
+          Upload Resume (PDF)
+        </h2>
+        {uploadError && (
+          <div className="mb-4 p-3 text-red-700 dark:text-red-300 bg-red-100 dark:bg-red-900 border border-red-300 dark:border-red-600 rounded-md text-sm">
+            {uploadError}
+          </div>
+        )}
+        <div className="flex flex-col sm:flex-row gap-4 items-center">
+          <input
+            type="file"
+            accept="application/pdf"
+            onChange={handleFileChange}
+            className="block w-full sm:w-auto text-sm text-gray-900 dark:text-gray-300 border border-gray-300 dark:border-gray-600 rounded-md cursor-pointer bg-gray-50 dark:bg-gray-700 focus:outline-none"
+            disabled={isUploading}
+          />
+          <button
+            onClick={handleFileUpload}
+            disabled={!file || isUploading}
+            className={`inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-primary hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-dark dark:focus:ring-offset-gray-900 ${
+              !file || isUploading ? "opacity-50 cursor-not-allowed" : ""
+            }`}
+          >
+            {isUploading ? (
+              <LoadingSpinner size="small" color="white" className="mr-2" />
+            ) : null}
+            {isUploading ? "Uploading..." : "Upload PDF"}
+          </button>
+        </div>
+        <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">
+          Upload a PDF resume to auto-fill the profile form.
+        </p>
+      </div>
+
       {showAddForm && (
         <div className="mb-8 p-4 sm:p-6 bg-white dark:bg-gray-800 rounded-lg shadow-md border dark:border-gray-700">
           <h2 className="text-lg sm:text-xl font-semibold mb-4 text-gray-800 dark:text-white border-b dark:border-gray-600 pb-2">
@@ -268,7 +388,7 @@ const ProfileManager: React.FC = () => {
                     type="tel"
                     id="phone"
                     name="phone"
-                    value={formData.phone ?? ""} // Handle null for controlled input
+                    value={formData.phone ?? ""}
                     onChange={handleInputChange}
                     className={getInputClasses()}
                     placeholder="Optional"
@@ -290,6 +410,21 @@ const ProfileManager: React.FC = () => {
                     disabled={isSubmitting}
                   />
                 </div>
+                <div className="md:col-span-2">
+                  <label htmlFor="links" className={labelBaseClass}>
+                    Links (Optional)
+                  </label>
+                  <input
+                    type="text"
+                    id="links"
+                    name="links"
+                    value={formData.links ?? ""}
+                    onChange={handleInputChange}
+                    className={getInputClasses()}
+                    placeholder="Comma-separated: https://linkedin.com/in/johndoe, https://github.com/johndoe"
+                    disabled={isSubmitting}
+                  />
+                </div>
               </div>
             </fieldset>
 
@@ -308,7 +443,7 @@ const ProfileManager: React.FC = () => {
                     value={formData.education ?? ""}
                     onChange={handleInputChange}
                     className={getInputClasses(true)}
-                    placeholder="List degrees, schools, dates..."
+                    placeholder="List degrees, schools, dates (one per line)..."
                     rows={3}
                     disabled={isSubmitting}
                   />
@@ -323,7 +458,7 @@ const ProfileManager: React.FC = () => {
                     value={formData.experience ?? ""}
                     onChange={handleInputChange}
                     className={getInputClasses(true)}
-                    placeholder="List job titles, companies, dates, achievements..."
+                    placeholder="List job titles, companies, dates, achievements (one per line)..."
                     rows={5}
                     disabled={isSubmitting}
                   />
@@ -353,7 +488,7 @@ const ProfileManager: React.FC = () => {
                     value={formData.certifications ?? ""}
                     onChange={handleInputChange}
                     className={getInputClasses(true)}
-                    placeholder="List certifications..."
+                    placeholder="List certifications (one per line)..."
                     rows={2}
                     disabled={isSubmitting}
                   />
@@ -369,7 +504,7 @@ const ProfileManager: React.FC = () => {
                     value={formData.languages ?? ""}
                     onChange={handleInputChange}
                     className={getInputClasses()}
-                    placeholder="e.g., English (Native), Spanish (Fluent)"
+                    placeholder="Comma-separated: English, Spanish..."
                     disabled={isSubmitting}
                   />
                 </div>
@@ -383,23 +518,8 @@ const ProfileManager: React.FC = () => {
                     value={formData.projects ?? ""}
                     onChange={handleInputChange}
                     className={getInputClasses(true)}
-                    placeholder="Describe projects, links if available..."
+                    placeholder="Describe projects, links if available (one per line)..."
                     rows={4}
-                    disabled={isSubmitting}
-                  />
-                </div>
-                <div className="md:col-span-2">
-                  <label htmlFor="hobbies" className={labelBaseClass}>
-                    Hobbies & Interests
-                  </label>
-                  <input
-                    type="text"
-                    id="hobbies"
-                    name="hobbies"
-                    value={formData.hobbies ?? ""}
-                    onChange={handleInputChange}
-                    className={getInputClasses()}
-                    placeholder="e.g., Hiking, Photography..."
                     disabled={isSubmitting}
                   />
                 </div>
@@ -413,6 +533,7 @@ const ProfileManager: React.FC = () => {
                   setShowAddForm(false);
                   setFormData(initialFormData);
                   setFormError("");
+                  setFile(null);
                 }}
                 className="px-3 py-1.5 sm:px-4 sm:py-2 border border-gray-300 dark:border-gray-500 rounded-md shadow-sm text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
               >
@@ -460,7 +581,8 @@ const ProfileManager: React.FC = () => {
                 No profiles created yet
               </h3>
               <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
-                Get started by creating your first profile.
+                Get started by creating your first profile or uploading a PDF
+                resume.
               </p>
             </div>
           )}
@@ -509,6 +631,16 @@ const ProfileManager: React.FC = () => {
                             Address:
                           </strong>{" "}
                           {profile.address}
+                        </p>
+                      )}
+                      {profile.links && (
+                        <p>
+                          <strong className="font-medium text-gray-800 dark:text-gray-200">
+                            Links:
+                          </strong>{" "}
+                          <span className="whitespace-pre-wrap block pl-2">
+                            {profile.links}
+                          </span>
                         </p>
                       )}
                       {profile.education && (
@@ -568,16 +700,6 @@ const ProfileManager: React.FC = () => {
                           </strong>{" "}
                           <span className="whitespace-pre-wrap block pl-2">
                             {profile.languages}
-                          </span>
-                        </p>
-                      )}
-                      {profile.hobbies && (
-                        <p>
-                          <strong className="font-medium text-gray-800 dark:text-gray-200">
-                            Hobbies:
-                          </strong>{" "}
-                          <span className="whitespace-pre-wrap block pl-2">
-                            {profile.hobbies}
                           </span>
                         </p>
                       )}

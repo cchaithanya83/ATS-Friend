@@ -22,7 +22,7 @@ async def create_resume(resume_data: dict, job_title: str, job_description: str)
         "5. Sections: Personal Info, Objective, Education, Work Experience, Skills, Certifications, Projects, Hobbies, Languages.\n"
         "6. For each section, apply:\n"
         "   - Section titles in cvblue, bold, with spacing optimized for compactness.\n"
-        "   - Personal Info: Centered name in bold, large font; email, phone, address below.\n"
+        "   - Personal Info: Centered name in bold, large font; email, phone, links below.\n"
         "   - Objective: One concise sentence summarizing experience, goals, and match with the job.\n"
         "   - Education & Work Experience: Use bold for title/degree, italics for company/institution, right-aligned dates, bullets for details.\n"
         "   - Skills: Bullet-pointed technical and soft skills, grouped and matched to the job.\n"
@@ -35,6 +35,9 @@ async def create_resume(resume_data: dict, job_title: str, job_description: str)
         "   - Match technical terms, skills, and achievements to the job description using clear, concise language.\n"
         "   - Do NOT include the job title or description text in the output.\n"
         "8. Final output must be complete, compilable with pdflatex, and free of errors, comments, or explanations.\n"
+        "9. Donot include page numbers or any empty lines. Donnot include any N/A or Null if not present dont include. \n"
+        "10. Ensure the output is concise, professional, and visually balanced.\n"
+        "11. Ensure the page has proper white space and is not too crowded. make sure everything is left aligned \n"
     )
 
     user_prompt = (
@@ -44,8 +47,7 @@ async def create_resume(resume_data: dict, job_title: str, job_description: str)
         "Resume Data:\n"
         f"{resume_data}\n\n"
         "Format the resume as follows:\n"
-        "- Personal Information (centered name in large bold, followed by email, phone, address).\n"
-        "- links: GitHub, LinkedIn, and personal website (if available).\n"
+        "- Personal Information (centered name in large bold, followed by email, phone, links).\n"
         "- Objective: One-line statement aligned with the job title and description.\n"
         "- Education: Degree (bold), Institution (italic), Dates (right-aligned), bullet points for details.\n"
         "- Work Experience: Title (bold), Company (italic), Dates (right-aligned), bullets for responsibilities.\n"

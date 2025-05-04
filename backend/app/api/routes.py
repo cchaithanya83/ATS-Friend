@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Depends, HTTPException
+from fastapi import FastAPI, Depends, File, HTTPException, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import StreamingResponse
 from pydantic import BaseModel
@@ -6,6 +6,7 @@ from app.core.database import UserRepository, ProfileRepository, ResumeRepositor
 from app.core.service import create_resume, convert_latex_to_pdf
 from app.api.models import LoginModel, NewResume, SignUpModel, UpdateUserSettingsModel, profileModel
 from app.core.logs import logger
+from app.core.service import convert_pdf_to_json
 
 api_routes = FastAPI()
 
@@ -40,8 +41,7 @@ class ResumeService:
         profile_details = self.profile_repo.get_by_id(new_resume.user_resume_id)
         if not profile_details:
             raise HTTPException(status_code=404, detail="Profile not found")
-
-        gen_resume = await create_resume(profile_details[0], new_resume.job_title, new_resume.job_description)
+        gen_resume = await create_resume(profile_details, new_resume.job_title, new_resume.job_description)
         if not gen_resume:
             raise HTTPException(status_code=500, detail="Resume generation failed")
 
@@ -138,7 +138,30 @@ async def new_profile(profile: profileModel, user_repo: UserRepository = Depends
     logger.error(f"Failed to create profile for user {profile.user_id}: {result['message']}")
     raise HTTPException(status_code=400, detail="Profile creation failed")
 
+@api_routes.post("/pdf-resume", response_model=ApiResponse)
+async def get_pdf_resume(pdf: UploadFile = File(...)):
+    """API endpoint to upload a PDF resume and convert it to a ProfileModel.
 
+    Args:
+        pdf (UploadFile): The uploaded PDF resume.
+
+    Returns:
+        ApiResponse: Contains the extracted resume data as a ProfileModel.
+    """
+    if not pdf:
+        logger.error("No PDF file provided")
+        raise HTTPException(status_code=400, detail="No PDF file provided")
+
+    try:
+        profile = await convert_pdf_to_json(pdf)
+        return ApiResponse(
+            status="success",
+            data={"resume_data": profile.dict()}
+        )
+    except RuntimeError as e:
+        logger.error(f"PDF conversion failed: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"PDF conversion failed: {str(e)}")
+    
 
 @api_routes.get("/profile/{user_id}", response_model=ApiResponse)
 async def get_profile_by_userid(user_id: int, profile_repo: ProfileRepository = Depends(get_profile_repo)):
@@ -148,8 +171,7 @@ async def get_profile_by_userid(user_id: int, profile_repo: ProfileRepository = 
         return ApiResponse(status="success", data={"profiles": profiles})
     else:
         return ApiResponse(status="success", data={"profiles": []})
-    logger.error(f"No profiles found for user {user_id}")
-    raise HTTPException(status_code=404, detail="User profiles not found")
+
 
 @api_routes.post("/profile/{user_id}/new_resume", response_model=ApiResponse)
 async def new_resumes(new_resume: NewResume, user_repo: UserRepository = Depends(get_user_repo), resume_service: ResumeService = Depends(get_resume_service)):

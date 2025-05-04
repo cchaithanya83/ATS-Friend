@@ -2,14 +2,16 @@ import sqlitecloud
 import os
 import bcrypt
 import logging
+import json
 from contextlib import contextmanager
 from dotenv import load_dotenv
+from typing import Optional, List, Dict
+
 load_dotenv()
 
 logger = logging.getLogger(__name__)
 
 def get_db_path():
-
     return os.getenv("SQLLITECLOUD")
 
 @contextmanager
@@ -19,6 +21,37 @@ def get_db_connection():
         yield conn
     finally:
         conn.close()
+
+# Centralized field configuration for ProfileModel
+PROFILE_FIELDS = [
+    {"name": "name", "sql_type": "TEXT NOT NULL", "is_json": False},
+    {"name": "email", "sql_type": "TEXT NOT NULL", "is_json": False},
+    {"name": "phone", "sql_type": "TEXT", "is_json": False},
+    {"name": "address", "sql_type": "TEXT", "is_json": False},
+    {"name": "links", "sql_type": "TEXT", "is_json": True, "json_type": "list[str]"},
+    {"name": "certifications", "sql_type": "TEXT", "is_json": True, "json_type": "list[dict]"},
+    {"name": "projects", "sql_type": "TEXT", "is_json": True, "json_type": "list[dict]"},
+    {"name": "languages", "sql_type": "TEXT", "is_json": True, "json_type": "list[str]"},
+    {"name": "education", "sql_type": "TEXT", "is_json": True, "json_type": "list[dict]"},
+    {"name": "experience", "sql_type": "TEXT", "is_json": True, "json_type": "list[dict]"},
+    {"name": "skills", "sql_type": "TEXT", "is_json": True, "json_type": "list[str]"},
+]
+
+def generate_profile_schema():
+    """Generate the profile table schema based on PROFILE_FIELDS."""
+    columns = [
+        "id INTEGER PRIMARY KEY AUTOINCREMENT",
+        "user_id INTEGER NOT NULL",
+        "profile_name TEXT NOT NULL",
+    ]
+    columns.extend(f"{field['name']} {field['sql_type']}" for field in PROFILE_FIELDS)
+    columns.append("created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
+    columns.append("FOREIGN KEY (user_id) REFERENCES user (id) ON DELETE CASCADE")
+    return f"""
+        CREATE TABLE IF NOT EXISTS profile (
+            {', '.join(columns)}
+        )
+    """
 
 TABLE_SCHEMAS = {
     "user": """
@@ -31,26 +64,7 @@ TABLE_SCHEMAS = {
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )
     """,
-    "profile": """
-        CREATE TABLE IF NOT EXISTS profile (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            user_id INTEGER NOT NULL,
-            profile_name TEXT NOT NULL,
-            name TEXT NOT NULL,
-            email TEXT NOT NULL,
-            phone TEXT,
-            address TEXT,
-            education TEXT,
-            experience TEXT,
-            skills TEXT,
-            certifications TEXT,
-            projects TEXT,
-            languages TEXT,
-            hobbies TEXT,
-            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-            FOREIGN KEY (user_id) REFERENCES user (id) ON DELETE CASCADE
-        )
-    """,
+    "profile": generate_profile_schema(),
     "new_resume": """
         CREATE TABLE IF NOT EXISTS new_resume (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -184,44 +198,68 @@ class ProfileRepository(BaseRepository):
     def create(self, profile_data: dict):
         logger.debug(f"Creating profile for user_id: {profile_data['user_id']}")
         try:
-            profile_id = self.insert(
-                """
-                INSERT INTO profile (user_id, profile_name, name, email, phone, address, education, experience, skills, certifications, projects, languages, hobbies)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-                """,
-                (
-                    profile_data['user_id'], profile_data['profile_name'], profile_data['name'], profile_data['email'],
-                    profile_data['phone'], profile_data['address'], profile_data['education'], profile_data['experience'],
-                    profile_data['skills'], profile_data['certifications'], profile_data['projects'], profile_data['languages'],
-                    profile_data['hobbies']
-                )
+            # Serialize structured fields to JSON
+            profile_data_serialized = profile_data.copy()
+            for field in PROFILE_FIELDS:
+                if field['is_json'] and field['name'] in profile_data_serialized and profile_data_serialized[field['name']] is not None:
+                    profile_data_serialized[field['name']] = json.dumps(profile_data_serialized[field['name']])
+                elif field['name'] not in profile_data_serialized or profile_data_serialized[field['name']] is None:
+                    profile_data_serialized[field['name']] = None
+
+            # Generate INSERT query dynamically
+            columns = ["user_id", "profile_name"] + [field['name'] for field in PROFILE_FIELDS]
+            placeholders = ", ".join(["?" for _ in columns])
+            query = f"""
+                INSERT INTO profile ({', '.join(columns)})
+                VALUES ({placeholders})
+            """
+            values = (
+                profile_data_serialized['user_id'],
+                profile_data_serialized['profile_name'],
+                *[profile_data_serialized[field['name']] for field in PROFILE_FIELDS]
             )
+
+            profile_id = self.insert(query, values)
             logger.info(f"Profile created successfully for user_id: {profile_data['user_id']}")
             return {"status": "success", "message": "Profile created successfully", "profile_id": profile_id}
         except sqlitecloud.Error as e:
             logger.error(f"Failed to create profile for user_id: {profile_data['user_id']} - {str(e)}")
             return {"status": "error", "message": str(e)}
+        except json.JSONDecodeError as e:
+            logger.error(f"JSON serialization failed for profile data: {str(e)}")
+            return {"status": "error", "message": "Invalid data format"}
 
     def get_by_user_id(self, user_id: int):
         profiles = self.fetch_all("SELECT * FROM profile WHERE user_id=?", (user_id,))
         return [
-            {
-                "id": p[0], "user_id": p[1], "profile_name": p[2], "name": p[3], "email": p[4], "phone": p[5],
-                "address": p[6], "education": p[7], "experience": p[8], "skills": p[9], "certifications": p[10],
-                "projects": p[11], "languages": p[12], "hobbies": p[13], "created_at": p[14]
-            } for p in profiles
+            self._deserialize_profile(p) for p in profiles
         ]
 
     def get_by_id(self, profile_id: int):
         profile = self.fetch_one("SELECT * FROM profile WHERE id=?", (profile_id,))
         if profile:
-            return [{
-                "id": profile[0], "user_id": profile[1], "profile_name": profile[2], "name": profile[3], "email": profile[4],
-                "phone": profile[5], "address": profile[6], "education": profile[7], "experience": profile[8], "skills": profile[9],
-                "certifications": profile[10], "projects": profile[11], "languages": profile[12], "hobbies": profile[13],
-                "created_at": profile[14]
-            }]
-        return []
+            return self._deserialize_profile(profile)
+        return None
+
+    def _deserialize_profile(self, profile: tuple) -> dict:
+        """Deserialize profile data from database row."""
+        try:
+            result = {
+                "id": profile[0],
+                "user_id": profile[1],
+                "profile_name": profile[2],
+                "created_at": profile[-1]
+            }
+            # Map fields from PROFILE_FIELDS (starting at index 3, after id, user_id, profile_name)
+            for i, field in enumerate(PROFILE_FIELDS, start=3):
+                if field['is_json'] and profile[i]:
+                    result[field['name']] = json.loads(profile[i])
+                else:
+                    result[field['name']] = profile[i]
+            return result
+        except json.JSONDecodeError as e:
+            logger.error(f"Failed to deserialize profile ID {profile[0]}: {str(e)}")
+            return None
 
 class ResumeRepository(BaseRepository):
     def __init__(self):

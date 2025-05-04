@@ -49,6 +49,7 @@ export interface ProfileModel {
   email: string; // Email associated with this profile
   phone?: string | null;
   address?: string | null;
+  links?: string | null; // Consider using a structured type later (e.g., array of objects)
   education?: string | null; // Consider using a structured type later (e.g., array of objects)
   experience?: string | null; // ^ same
   skills?: string | null; // ^ same
@@ -88,4 +89,33 @@ export interface UpdateUserPayload {
   password?: string;
   phone?: string | null;
   // Add other updatable fields if needed
+}
+export interface ResumeData {
+  name: string;
+  email: string;
+  phone: string;
+  address: string;
+  links: string[];
+  education: Array<{
+    degree: string;
+    university: string;
+    year: string;
+  }>;
+  experience: Array<{
+    role: string;
+    company: string;
+    description: string;
+    years: string;
+  }>;
+  skills: string[];
+  certifications: Array<{
+    name: string;
+    issuer: string;
+  }>;
+  projects: Array<{
+    name: string;
+    description: string;
+    year: string;
+  }>;
+  languages: string[];
 }

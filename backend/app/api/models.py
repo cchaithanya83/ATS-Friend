@@ -31,6 +31,7 @@ class profileModel(BaseModel):
     email: str
     phone: Optional[str] = None
     address: Optional[str] = None
+    links: Optional[str] = None
     education: Optional[str] = None
     experience: Optional[str] = None
     skills: Optional[str] = None
