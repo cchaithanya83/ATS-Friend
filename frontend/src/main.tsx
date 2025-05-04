@@ -1,5 +1,4 @@
 // src/main.tsx
-import React from "react";
 import ReactDOM from "react-dom/client";
 import { BrowserRouter } from "react-router-dom"; // Make sure this is imported
 import App from "./App"; // Make sure the path is correct
@@ -18,14 +17,12 @@ if (!rootElement) {
   console.log("Mounting React App within BrowserRouter and ThemeProvider...");
 
   ReactDOM.createRoot(rootElement).render(
-
-      <BrowserRouter>
-        {/* ThemeProvider can be inside or outside BrowserRouter, inside is fine */}
-        <ThemeProvider>
-          <App /> {/* App component is rendered here */}
-        </ThemeProvider>
-      </BrowserRouter>
-
+    <BrowserRouter>
+      {/* ThemeProvider can be inside or outside BrowserRouter, inside is fine */}
+      <ThemeProvider>
+        <App /> {/* App component is rendered here */}
+      </ThemeProvider>
+    </BrowserRouter>
   );
 
   console.log("React App mounting initiated."); // Check if this logs
