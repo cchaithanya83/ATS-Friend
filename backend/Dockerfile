@@ -19,3 +19,7 @@ COPY . .
 CMD ["uvicorn", "main:api_routes", "--host", "0.0.0.0", "--port", "10000"]
 EXPOSE 10000
 # Use the following command to build the Docker image
+# docker build -t ats-friend-backend .
+# Use the following command to run the Docker container
+# docker run -d -p 10000:10000 --name ats-friend-backend-container ats-friend-backend
+#open in browser http://localhost:10000/docs

@@ -1,4 +1,4 @@
-import sqlitecloud
+import sqlite3
 import os
 import bcrypt
 import logging
@@ -12,11 +12,11 @@ load_dotenv()
 logger = logging.getLogger(__name__)
 
 def get_db_path():
-    return os.getenv("SQLLITECLOUD")
+    return os.getenv("sqlite_db_path", "app.db")
 
 @contextmanager
 def get_db_connection():
-    conn = sqlitecloud.connect(get_db_path())
+    conn = sqlite3.connect(get_db_path())
     try:
         yield conn
     finally:
@@ -137,7 +137,7 @@ class UserRepository(BaseRepository):
             )
             logger.info(f"Successful signup for email: {email}")
             return {"status": "success", "user": {"name": name, "email": email}}
-        except sqlitecloud.IntegrityError:
+        except sqlite3.IntegrityError:
             logger.error(f"Signup failed for email: {email} - User already exists")
             return {"status": "error", "message": "User already exists"}
 
@@ -184,7 +184,7 @@ class UserRepository(BaseRepository):
                     return {"status": "error", "message": "User not found or no changes made"}
                 logger.info(f"User ID: {user_id} updated successfully. Fields: {list(update_data.keys())}")
                 return {"status": "success", "message": "User updated successfully"}
-        except sqlitecloud.Error as e:
+        except sqlite3.Error as e:
             logger.error(f"Database error updating user ID: {user_id} - {str(e)}")
             return {"status": "error", "message": f"Database error: {str(e)}"}
         except Exception as e:
@@ -222,7 +222,7 @@ class ProfileRepository(BaseRepository):
             profile_id = self.insert(query, values)
             logger.info(f"Profile created successfully for user_id: {profile_data['user_id']}")
             return {"status": "success", "message": "Profile created successfully", "profile_id": profile_id}
-        except sqlitecloud.Error as e:
+        except sqlite3.Error as e:
             logger.error(f"Failed to create profile for user_id: {profile_data['user_id']} - {str(e)}")
             return {"status": "error", "message": str(e)}
         except json.JSONDecodeError as e:
@@ -280,7 +280,7 @@ class ResumeRepository(BaseRepository):
             )
             logger.info(f"Resume created successfully for user_id: {resume_data['user_id']}")
             return {"status": "success", "message": "Resume created successfully", "resume_id": resume_id}
-        except sqlitecloud.Error as e:
+        except sqlite3.Error as e:
             logger.error(f"Failed to create resume for user_id: {resume_data['user_id']} - {str(e)}")
             return {"status": "error", "message": str(e)}
 

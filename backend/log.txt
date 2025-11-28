@@ -717,3 +717,25 @@
 2025-04-29 13:59:33,754 - app.core.logs - INFO - Signup attempt for email: string
 2025-04-29 13:59:34,038 - app.core.database.config - INFO - Successful signup for email: string
 2025-04-29 13:59:34,038 - app.core.logs - INFO - User string signed up successfully
+2025-11-28 16:30:32,375 - app.core.logs - INFO - Starting the FastAPI application
+2025-11-28 16:34:43,938 - app.core.logs - INFO - Signup attempt for email: cchaithanya83@gmail.com
+2025-11-28 16:34:44,181 - app.core.database.config - INFO - Successful signup for email: cchaithanya83@gmail.com
+2025-11-28 16:34:44,181 - app.core.logs - INFO - User cchaithanya83@gmail.com signed up successfully
+2025-11-28 16:34:53,366 - app.core.logs - INFO - Login attempt for email: cchaithanya83@gmail.com
+2025-11-28 16:34:53,606 - app.core.database.config - INFO - Successful login for email: cchaithanya83@gmail.com
+2025-11-28 16:34:53,607 - app.core.logs - INFO - User cchaithanya83@gmail.com logged in successfully
+2025-11-28 16:35:04,159 - google_genai.models - INFO - AFC is enabled with max remote calls: 10.
+2025-11-28 16:35:10,834 - httpx - INFO - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent "HTTP/1.1 200 OK"
+2025-11-28 16:35:10,841 - google_genai.models - INFO - AFC remote call 1 is done.
+2025-11-28 16:35:24,788 - app.core.database.config - INFO - Profile created successfully for user_id: 1
+2025-11-28 16:35:24,788 - app.core.logs - INFO - Profile created for user 1
+2025-11-28 16:35:28,805 - app.core.logs - INFO - Profiles retrieved for user 1
+2025-11-28 16:35:50,156 - app.core.logs - INFO - Profiles retrieved for user 1
+2025-11-28 16:35:53,207 - app.core.logs - INFO - Profiles retrieved for user 1
+2025-11-28 16:35:55,646 - app.core.logs - INFO - Profiles retrieved for user 1
+2025-11-28 16:36:58,759 - google_genai.models - INFO - AFC is enabled with max remote calls: 10.
+2025-11-28 16:37:05,791 - httpx - INFO - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-001:generateContent "HTTP/1.1 200 OK"
+2025-11-28 16:37:05,792 - google_genai.models - INFO - AFC remote call 1 is done.
+2025-11-28 16:37:05,806 - app.core.database.config - INFO - Resume created successfully for user_id: 1
+2025-11-28 16:37:05,806 - app.core.logs - INFO - Resume created for user 1
+2025-11-28 16:37:05,819 - app.core.logs - INFO - Resume 1 retrieved for user 1

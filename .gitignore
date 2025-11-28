@@ -3,3 +3,6 @@ venv
 __pycache__/
 *.pyc
 .log
+*.db
+app.db
+log.txt
